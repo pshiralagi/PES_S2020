@@ -1,0 +1,8 @@
+Original input in hex, 0xFACE
+True, 1111101011001110
+Reversed bytes, 0xCEFA
+False, 1100111011111010
+Rotated 6 bits to the left, 0xBEB3
+False, 1011111010110011
+Rotated 4 bits to the right, 0x3BEB
+True, 0011101111101011

@@ -1,0 +1,88 @@
+Enter Value,Radix,Operand Size: -7,10,4
+Input:   Value -7        Radix 10        Operand Size 4
+Output:                         Value                   Maximum                 Minimum
+Binary(abs)                     0b0111                  0b1111                  0b0000
+Octal(abs)                      07                      17                      00
+Decimal(abs)                    7                       0                       15
+Hexadecimal(abs)                0x7                     0xF                     0x0
+Signed One's Compliment         0b1000                  0b0000                  0b1111
+Signed Two's Compliment         0b1001                  0b0000                  0b0001
+Signed Magnitude                0b1111                  0b0111                  0b1000
+
+Enter Value,Radix,Operand Size: -7,9,4
+Invalid Radix
+
+Enter Value,Radix,Operand Size: -7,10,5
+Invalid Operand
+
+Enter Value,Radix,Operand Size: -10,10,4
+Input Out of Range
+
+Enter Value,Radix,Operand Size: 236,10,8
+Input:   Value 236       Radix 10        Operand Size 8
+Output:                         Value                   Maximum                 Minimum
+Binary(abs)                     0b11101100              0b11111111              0b00000000
+Octal(abs)                      0354                    0377                    0000
+Decimal(abs)                    236                     0                       255
+Hexadecimal(abs)                0xEC                    0xFF                    0x00
+Signed One's Compliment         Error                   Error                   Error
+Signed Two's Compliment         Error                   Error                   Error
+Signed Magnitude                Error                   Error                   Error
+
+Enter Value,Radix,Operand Size: 0354,8,8
+Input:   Value 0354      Radix 8         Operand Size 8
+Output:                         Value                   Maximum                 Minimum
+Binary(abs)                     0b11101100              0b11111111              0b00000000
+Octal(abs)                      0354                    0377                    0000
+Decimal(abs)                    236                     0                       255
+Hexadecimal(abs)                0xEC                    0xFF                    0x00
+Signed One's Compliment         Error                   Error                   Error
+Signed Two's Compliment         Error                   Error                   Error
+Signed Magnitude                Error                   Error                   Error
+
+Enter Value,Radix,Operand Size: 0xEB,16,8
+Input:   Value 0xEB      Radix 16        Operand Size 8
+Output:                         Value                   Maximum                 Minimum
+Binary(abs)                     0b11101011              0b11111111              0b00000000
+Octal(abs)                      0353                    0377                    0000
+Decimal(abs)                    235                     0                       255
+Hexadecimal(abs)                0xEB                    0xFF                    0x00
+Signed One's Compliment         Error                   Error                   Error
+Signed Two's Compliment         Error                   Error                   Error
+Signed Magnitude                Error                   Error                   Error
+
+Enter Value,Radix,Operand Size: -125,10,8
+Input:   Value -125      Radix 10        Operand Size 8
+Output:                         Value                   Maximum                 Minimum
+Binary(abs)                     0b01111101              0b11111111              0b00000000
+Octal(abs)                      0175                    0377                    0000
+Decimal(abs)                    125                     0                       255
+Hexadecimal(abs)                0x7D                    0xFF                    0x00
+Signed One's Compliment         0b10000010              0b00000000              0b11111111
+Signed Two's Compliment         0b10000011              0b00000000              0b00000001
+Signed Magnitude                0b11111101              0b01111111              0b10000000
+
+Enter Value,Radix,Operand Size: 65400,10,8
+Input Out of Range
+
+Enter Value,Radix,Operand Size: 65400,10,16
+Input:   Value 65400     Radix 10        Operand Size 16
+Output:                         Value                   Maximum                 Minimum
+Binary(abs)                     0b1111111101111000      0b1111111111111111      0b0000000000000000
+Octal(abs)                      00177570                00177777                00000000
+Decimal(abs)                    65400                   0                       65535
+Hexadecimal(abs)                0xFF78                  0xFFFF                  0x0000
+Signed One's Compliment         Error                   Error                   Error
+Signed Two's Compliment         Error                   Error                   Error
+Signed Magnitude                Error                   Error                   Error
+
+Enter Value,Radix,Operand Size: -32701,10,16
+Input:   Value -32701    Radix 10        Operand Size 16
+Output:                         Value                   Maximum                 Minimum
+Binary(abs)                     0b0111111110111101      0b1111111111111111      0b0000000000000000
+Octal(abs)                      00077675                00177777                00000000
+Decimal(abs)                    32701                   0                       65535
+Hexadecimal(abs)                0x7FBD                  0xFFFF                  0x0000
+Signed One's Compliment         0b1000000001000010      0b0000000000000000      0b1111111111111111
+Signed Two's Compliment         0b1000000001000011      0b0000000000000000      0b0000000000000001
+Signed Magnitude                0b1111111110111101      0b0111111111111111      0b1000000000000000
