@@ -31,6 +31,7 @@
 /**
  * @file    PES_Project_2.c
  * @brief   Application entry point.
+ * @author	Pavan Shiralagi and Antara Prakash
  */
 #include <stdio.h>
 #include "board.h"
