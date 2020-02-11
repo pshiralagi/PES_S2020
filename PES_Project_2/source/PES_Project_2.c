@@ -42,7 +42,7 @@ int main(void) {
     PRINTF("\n\rProgram Start\n\r");
 #endif
 #ifdef PC_DEBUG
-    PRINTF("\n\rProgram Start\n\r");
+    printf("\n\rProgram Start\n\r");
 #endif
 
 #ifdef FB_RUN
@@ -62,10 +62,6 @@ int main(void) {
 //    	PRINTF("\n\rCap value : %d", touch_scan());
 //    }
 
-#ifdef FB_DEBUG
-		PRINTF("\n\rTouch value is %d",cap_val);
-#endif
-
 
     	led_blink_cap();
 
@@ -80,7 +76,7 @@ int main(void) {
     PRINTF("\n\rProgram ending, going to while loop\n\r");
 #endif
 #ifdef PC_DEBUG
-    PRINTF("\n\rProgram ending, going to while loop\n\r");
+    printf("\n\rProgram ending, going to while loop\n\r");
 #endif
 
     /* Force the counter to be placed into memory. */
