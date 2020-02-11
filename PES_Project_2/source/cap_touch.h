@@ -10,10 +10,10 @@
 #ifndef cap_touch_h
 #define cap_touch_h
 
-#include "MKL25Z4.h"
+#include "general.h"
 
 void touch_init(void);
-uint16_t touch_scan(void);
+uint32_t touch_scan(void);
 
 // Macros
 #define SCAN_OFFSET 544  // Offset for scan range
