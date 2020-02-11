@@ -11,12 +11,11 @@
 #define led_h
 
 //Includes
-#include "MKL25Z4.h"
-#include "time.h"
+#include "general.h"
 
 
 void led_init(void);
-void led_blink_cap(uint16_t cap_val);
+void led_blink_cap();
 
 //Defines
 #define RED_LED_PIN   (18)	//Pin 18, Port B

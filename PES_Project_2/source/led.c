@@ -46,55 +46,138 @@ void led_init(void)
 
 }
 
-void led_blink_cap(uint16_t cap_val)
+void led_blink_cap()
 {
-	static uint8_t loop = 0;//Initializing to 0 only once
+	uint32_t cap_val;
+	uint8_t loop, count;//Initializing to 0 only once
+#ifdef PC_RUN
+	uint8_t ledTrig = 0, LED_G, LED_B, LED_R = 1, loop_no = 1;//Initializing values only once
+#endif
 	uint16_t arr_time[4] = {500, 1000, 2000, 3000};
 	/*	PSOR sets output register, PCOR clears output register	*/
-	if(cap_val < 131)
+#ifdef FB_RUN
+	for (count = 0; count < 10; count++)
 	{
-#ifdef FB_DEBUG
-		PRINTF("\n\rSwitching red LED on");
-#endif
-		PTB->PCOR = MASK(RED_LED_PIN);
-	}
-	if((cap_val > 130 ) & (cap_val < 141 ))
-	{
-#ifdef FB_DEBUG
-		PRINTF("\n\rSwitching red LED on");
-#endif
-		PTB->PCOR = MASK(GREEN_LED_PIN);
-	}
-	if(cap_val > 140)
-	{
-#ifdef FB_DEBUG
-		PRINTF("\n\rSwitching red LED on");
-#endif
-		PTD->PCOR = MASK(BLUE_LED_PIN);
-	}
+		cap_val = touch_scan();
+		for(loop = 0; loop < 4; loop++)
+		{
+			if(cap_val < 6001)
+			{
+		#ifdef FB_DEBUG
+				PRINTF("\n\rSwitching red LED on");
+		#endif
+				PTB->PCOR = MASK(RED_LED_PIN);
+			}
+			if((cap_val > 6000 ) & (cap_val < 9001 ))
+			{
+		#ifdef FB_DEBUG
+				PRINTF("\n\rSwitching red LED on");
+		#endif
+				PTB->PCOR = MASK(GREEN_LED_PIN);
+			}
+			if(cap_val > 9000)
+			{
+		#ifdef FB_DEBUG
+				PRINTF("\n\rSwitching red LED on");
+		#endif
+				PTD->PCOR = MASK(BLUE_LED_PIN);
+			}
 
-#ifdef FB_DEBUG
-		PRINTF("\n\rLED on time is %d milliseconds", arr_time[loop]);
-#endif
-	wait_ms(arr_time[loop]);
-#ifdef FB_DEBUG
-		PRINTF("\n\rDone waiting");
+		#ifdef FB_DEBUG
+				PRINTF("\n\rLED on time is %d milliseconds", arr_time[loop]);
+		#endif
+			wait_ms(arr_time[loop]);
+			cap_val = touch_scan();
+		#ifdef FB_DEBUG
+				PRINTF("\n\rDone waiting");
+		#endif
+
+			PTB->PSOR = MASK(RED_LED_PIN);
+			PTB->PSOR = MASK(GREEN_LED_PIN);
+			PTD->PSOR = MASK(BLUE_LED_PIN);
+		#ifdef FB_DEBUG
+			PRINTF("\n\rAll LEDs off");
+		#endif
+
+			wait_ms(500);
+		}
+
+
+	}
 #endif
 
-	PTB->PSOR = MASK(RED_LED_PIN);
-	PTB->PSOR = MASK(GREEN_LED_PIN);
-	PTD->PSOR = MASK(BLUE_LED_PIN);
-#ifdef FB_DEBUG
-	PRINTF("\n\rAll LEDs off");
-#endif
 
-	if (loop < 4)
+#ifdef PC_RUN
+	for(count = 0; count < 10; count++)
 	{
-		loop++;
+		for(loop = 0; loop < 4; loop++)
+		{
+			if(LED_R == 1)
+			{
+		#ifdef PC_DEBUG
+				printf("\n\rSwitching red LED on");
+		#endif
+				printf("\n\rRed LED on");
+			}
+			if(LED_G == 1)
+			{
+		#ifdef PC_DEBUG
+				printf("\n\rSwitching Green LED on");
+		#endif
+				printf("\n\rGreen LED on");
+			}
+			if(LED_B == 1)
+			{
+		#ifdef PC_DEBUG
+				printf("\n\rSwitching Blue LED on");
+		#endif
+				printf("\n\rBlue LED on");
+			}
+
+		#ifdef PC_DEBUG
+				printf("\n\rLED on time is %d milliseconds", arr_time[loop]);
+		#endif
+			wait_ms(arr_time[loop]);
+		#ifdef PC_DEBUG
+				printf("\n\rDone waiting");
+		#endif
+
+				printf("\n\rAll LEDs off");
+		#ifdef PC_DEBUG
+				printf("\n\rAll LEDs off");
+		#endif
+
+			if (loop_no == 3)
+			{
+				ledTrig++;
+				if(ledTrig == 1)
+				{
+					LED_G = 1;
+					LED_R = 0;
+					LED_B = 0;
+				}
+				if(ledTrig == 2)
+				{
+					LED_B = 1;
+					LED_G = 0;
+					LED_R = 0;
+				}
+				if(ledTrig == 3)
+				{
+					LED_R = 1;
+					LED_G = 0;
+					LED_B = 0;
+					ledTrig = 0;
+				}
+				loop_no = 0;
+			}
+			loop_no++;
+		}
+
 	}
-	if (loop > 3)
-	{
-		loop = 0;
-	}
+#endif
 
 }
+
+
+
