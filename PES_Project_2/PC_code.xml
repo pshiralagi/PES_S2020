@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<cdtprojectproperties>
+<section name="org.eclipse.cdt.internal.ui.wizards.settingswizards.IncludePaths">
+<language name="Assembly Source File">
+<includepath workspace_path="true">/${ProjName}/board</includepath>
+<includepath workspace_path="true">/${ProjName}/source</includepath>
+<includepath workspace_path="true">/${ProjName}/</includepath>
+<includepath workspace_path="true">/${ProjName}/drivers</includepath>
+<includepath workspace_path="true">/${ProjName}/CMSIS</includepath>
+<includepath workspace_path="true">/${ProjName}/utilities</includepath>
+<includepath workspace_path="true">/${ProjName}/startup</includepath>
+
+</language>
+<language name="C Source File">
+<includepath workspace_path="true">/${ProjName}/board</includepath>
+<includepath workspace_path="true">/${ProjName}/source</includepath>
+<includepath workspace_path="true">/${ProjName}/</includepath>
+<includepath workspace_path="true">/${ProjName}/drivers</includepath>
+<includepath workspace_path="true">/${ProjName}/CMSIS</includepath>
+<includepath workspace_path="true">/${ProjName}/utilities</includepath>
+<includepath workspace_path="true">/${ProjName}/startup</includepath>
+
+</language>
+<language name="Object File">
+
+</language>
+</section>
+<section name="org.eclipse.cdt.internal.ui.wizards.settingswizards.Macros">
+<language name="Assembly Source File">
+
+</language>
+<language name="C Source File">
+<macro>
+<name>__REDLIB__</name><value/>
+</macro>
+<macro>
+<name>CPU_MKL25Z128VLK4_cm0plus</name><value/>
+</macro>
+<macro>
+<name>CPU_MKL25Z128VLK4</name><value/>
+</macro>
+<macro>
+<name>SDK_OS_BAREMETAL</name><value/>
+</macro>
+<macro>
+<name>FSL_RTOS_BM</name><value/>
+</macro>
+<macro>
+<name>SDK_DEBUGCONSOLE</name><value>0</value>
+</macro>
+<macro>
+<name>CR_INTEGER_PRINTF</name><value/>
+</macro>
+<macro>
+<name>PRINTF_FLOAT_ENABLE</name><value>0</value>
+</macro>
+<macro>
+<name>SDK_DEBUGCONSOLE_UART</name><value/>
+</macro>
+<macro>
+<name>__MCUXPRESSO</name><value/>
+</macro>
+<macro>
+<name>__USE_CMSIS</name><value/>
+</macro>
+<macro>
+<name>DEBUG</name><value/>
+</macro>
+
+</language>
+<language name="Object File">
+
+</language>
+</section>
+</cdtprojectproperties>

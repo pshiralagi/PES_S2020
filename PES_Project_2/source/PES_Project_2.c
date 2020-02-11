@@ -67,9 +67,8 @@ int main(void) {
 #endif
 
 
-#ifdef FB_RUN
     	led_blink_cap();
-#endif
+
 
 
 #ifdef FB_DEBUG
