@@ -46,7 +46,7 @@ void touch_init()
 }
 
 // Function to read touch sensor from low to high capacitance for left to right
-uint16_t touch_scan(void)
+uint32_t touch_scan(void)
 {
 #ifdef FB_DEBUG
 		PRINTF("\n\rScanning for touch");
@@ -57,5 +57,5 @@ uint16_t touch_scan(void)
 	scan = SCAN_DATA;
 	TSI0->GENCS |= TSI_GENCS_EOSF_MASK ; // Reset end of scan flag
 
-	return scan - SCAN_OFFSET;
+	return (scan - SCAN_OFFSET)*10;
 }

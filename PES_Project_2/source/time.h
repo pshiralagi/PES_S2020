@@ -9,7 +9,7 @@
 
 #ifndef time_h
 #define time_h
-#include "MKL25Z4.h"
+#include "general.h"
 
 
 void wait_ms(uint32_t time);

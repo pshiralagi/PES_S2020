@@ -31,61 +31,53 @@
 /**
  * @file    PES_Project_2.c
  * @brief   Application entry point.
+ * @author	Pavan Shiralagi and Antara Prakash
  */
-#include <stdio.h>
-#include "board.h"
-#include "peripherals.h"
-#include "pin_mux.h"
-#include "clock_config.h"
-#include "MKL25Z4.h"
-#include "fsl_debug_console.h"
-/* TODO: insert other include files here. */
-#include "led.h"
-#include "cap_touch.h"
-/* TODO: insert other definitions and declarations here. */
-
-#define FB_RUN 1	//Non - debug program run natively on the board
-//#define FB_DEBUG 1	//Debug version of FB_RUN, includes print statements
-//#define PC_RUN 1	//Not run on the board, run on the PC where statements are printed to the debug console
-//#define PC_DEBUG 1	//Debug version of PC_RUN with a lot more debug statements
-
+#include "general.h"
 /*
  * @brief   Application entry point.
  */
 int main(void) {
-
 #ifdef FB_DEBUG
-#define FB_RUN
+    PRINTF("\n\rProgram Start\n\r");
 #endif
 #ifdef PC_DEBUG
-#define PC_RUN
+    printf("\n\rProgram Start\n\r");
 #endif
 
-	uint8_t count;
-	uint16_t cap_val;
+#ifdef FB_RUN
   	/* Init board hardware. */
     BOARD_InitBootPins();
     BOARD_InitBootClocks();
     BOARD_InitBootPeripherals();
   	/* Init FSL debug console. */
     BOARD_InitDebugConsole();
-#ifdef FB_RUN
+
+
     led_init();
     touch_init();
 #endif
-    for(count = 0; count < 200; count++)
-    {
-    	cap_val = touch_scan();
-#ifdef FB_DEBUG
-		PRINTF("\n\rTouch value is %d",cap_val);
-#endif
-    	led_blink_cap(cap_val);
+//    while(1)
+//    {
+//    	PRINTF("\n\rCap value : %d", touch_scan());
+//    }
+
+
+    	led_blink_cap();
+
+
+
 #ifdef FB_DEBUG
 		PRINTF("\n\rGoing to wait 500ms before switching LED on");
 #endif
-    	wait_ms(500);
-    }
+
+
+#ifdef FB_DEBUG
     PRINTF("\n\rProgram ending, going to while loop\n\r");
+#endif
+#ifdef PC_DEBUG
+    printf("\n\rProgram ending, going to while loop\n\r");
+#endif
 
     /* Force the counter to be placed into memory. */
     volatile static int i = 0 ;
