@@ -49,6 +49,7 @@ void led_init(void)
 void led_blink_cap()
 {
 	uint32_t cap_val;
+
 	uint8_t loop, count;//Initializing to 0 only once
 #ifdef PC_RUN
 	uint8_t ledTrig = 0, LED_G, LED_B, LED_R = 1, loop_no = 1;//Initializing values only once
@@ -59,6 +60,9 @@ void led_blink_cap()
 	for (count = 0; count < 10; count++)
 	{
 		cap_val = touch_scan();
+#ifdef FB_DEBUG
+		PRINTF("\n\rTouch value is %d",cap_val);
+#endif
 		for(loop = 0; loop < 4; loop++)
 		{
 			if(cap_val < 6001)
