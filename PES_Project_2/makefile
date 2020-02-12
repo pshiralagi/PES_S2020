@@ -1,34 +1,41 @@
-#############################
+#	@file : makefile
+#	@author : Pavan Shiralagi and Antara Prakash
+#	@date : 02/09/2020
+#	@description : Makefile to build project for four different configurations, two configrations
+#					run on the board and two on the PC
+#	@references : https://www3.ntu.edu.sg/home/ehchua/programming/cpp/gcc_make.html	\
+				  https://github.com/ErichStyger/mcuoneclipse/tree/master/Examples/MCUXpresso/FRDM-KL25Z/MyMakeProject
+
 # Command for removing files
 RM := rm -rf
 
-#############################
-# Include files
-INCLUDES := \
+
+# Include files for FB versions
+BOARD_INCLUDE := \
 	-I"CMSIS" \
 	-I"source" \
 	-I"board" \
 	-I"drivers" \
 	-I"utilities"
-	
-PC_INCLUDES := \
+
+# Include for PC versions
+PC_INCLUDE := \
 	-I"C:\MinGW\include"
-############################
-# Compiler for FB versions
+	
+
+# Compiler for FB versions (arm compiler)
 CC := arm-none-eabi-gcc
 
-############################
-# Linker for FB versions
+# Linker for FB versions (arm linker)
 LL := arm-none-eabi-gcc
 
-###########################################
-# Executable to build for FB versions
+# Executable to build for FB versions (.axf)
 EXE := \
   ./debug/PES_Project_2.axf
 
-#######################################
 # List of object files for FB versions
-OBJS := ./debug/PES_Project_2.o \
+OBJS := \
+	./debug/PES_Project_2.o \
 	./debug/led.o \
 	./debug/cap_touch.o \
 	./debug/time.o \
@@ -47,40 +54,19 @@ OBJS := ./debug/PES_Project_2.o \
 	./debug/fsl_uart.o \
 	./debug/fsl_debug_console.o
 	
-############################
 # List of dependency files 
 C_DEPS = \
-	./debug/PES_Project_2.d \
-	./debug/led.d \
-	./debug/cap_touch.d \
-	./debug/time.d \
-	./debug/general.d \
-	./debug/startup_mkl25z4.d \
-	./debug/system_MKL25Z4.d \
-	./debug/board.d \
-	./debug/clock_config.d \
-	./debug/peripherals.d \
-	./debug/pin_mux.d \
-	./debug/fsl_clock.d \
-	./debug/fsl_common.d \
-	./debug/fsl_flash.d \
-	./debug/fsl_gpio.d \
-	./debug/fsl_lpsci.d \
-	./debug/fsl_smc.d \
-	./debug/fsl_uart.d \
-	./debug/fsl_debug_console.d
+	$(wildcard ./debug/*.d)
  
-##############################################################
-# Include generated dependency files (only if not clean target)
+# Include generated dependency files, if target is not clean
 ifneq ($(MAKECMDGOALS),clean)
 ifneq ($(strip $(C_DEPS)),)
 -include $(C_DEPS)
 endif
 endif
 
-##################################
 # Compiler options for FB versions
-CC_OPTIONS := \
+C_OPTIONS := \
 	-c \
 	-std=gnu99 \
 	-O0 \
@@ -95,7 +81,6 @@ CC_OPTIONS := \
 	-Wall \
 	-Werror
 
-################################
 # Build options for FB versions
 B_OPTIONS := \
 	-D__REDLIB__ \
@@ -116,115 +101,106 @@ B_OPTIONS := \
 	-DFREEDOM \
 	-specs=redlib.specs \
 
-################################
 # Linker Options for FB versions
-LL_OPTIONS := -nostdlib -Xlinker -Map="debug/MyMakeProject.map" -Xlinker --gc-sections -Xlinker -print-memory-usage -mcpu=cortex-m0plus -mthumb -T linkerfile.ld -o $(EXE)
+L_OPTIONS := -nostdlib -Xlinker -Map="debug/MyMakeProject.map" -Xlinker --gc-sections -Xlinker -print-memory-usage -mcpu=cortex-m0plus -mthumb -T linkerfile.ld -o $(EXE)
 
-###########################################################
-# Checking different versions and enabling necessary macros
+# Building correct version (FB_RUN | FB_DEBUG | PC_RUN | PC_DEBUG)
+######
+#FB_RUN version
 ifeq ($(VERSION), FB_RUN)
 ./debug/%.o: ./source/%.c   
 	@echo 'Building file: $<'
-	$(CC) $(CC_OPTIONS) $(B_OPTIONS) -DFB_RUN $(INCLUDES) -MMD -MP -MF"$(@:%.o=%.d)" -MT"$(@:%.o=%.o)" -MT"$(@:%.o=%.d)" -o "$@" "$<" 
+	$(CC) $(C_OPTIONS) $(B_OPTIONS) -DFB_RUN $(BOARD_INCLUDE) -MMD -MP -MF"$(@:%.o=%.d)" -MT"$(@:%.o=%.o)" -MT"$(@:%.o=%.d)" -o "$@" "$<" 
 	@echo 'Finished building: FB_RUN $<'
 	@echo ' '
 
+#FB_DEBUG version
 else ifeq ($(VERSION), FB_DEBUG)
 ./debug/%.o: ./source/%.c   
 	@echo 'Building file: $<'
-	$(CC) $(CC_OPTIONS) $(B_OPTIONS) -DFB_DEBUG $(INCLUDES) -MMD -MP -MF"$(@:%.o=%.d)" -MT"$(@:%.o=%.o)" -MT"$(@:%.o=%.d)" -o "$@" "$<" 
+	$(CC) $(C_OPTIONS) $(B_OPTIONS) -DFB_DEBUG $(BOARD_INCLUDE) -MMD -MP -MF"$(@:%.o=%.d)" -MT"$(@:%.o=%.o)" -MT"$(@:%.o=%.d)" -o "$@" "$<" 
 	@echo 'Finished building: FB_DEBUG $<'
 	@echo ' '
 
+#PC_RUN version
 else ifeq ($(VERSION), PC_RUN)
 CC := gcc						#MinGW gcc compiler [1]
 EXE := \
   ./debug/PES_Project_2.exe
 OBJS := ./debug/PES_Project_2.o
 LL := gcc
-LL_OPTIONS := -g -o $(EXE)		#Flags for converting an object file into executable file [1] 
+L_OPTIONS := -g -o $(EXE)		#Flags for converting an object file into executable file [1] 
 ./debug/PES_Project_2.o: ./source/PES_Project_2.c   
 	@echo 'Building file: $<'
-	$(CC) -c -std=gnu99 -DPC_RUN $(PC_INCLUDES) -MMD -MP -MF"$(@:%.o=%.d)" -MT"$(@:%.o=%.o)" -MT"$(@:%.o=%.d)" -o "$@" "$<" 
+	$(CC) -c -std=gnu99 -DPC_RUN $(PC_INCLUDE) -MMD -MP -MF"$(@:%.o=%.d)" -MT"$(@:%.o=%.o)" -MT"$(@:%.o=%.d)" -o "$@" "$<" 
 	@echo 'Finished building: PC_RUN $<'
 	@echo ' '
 	
+#PC_DEBUG version
 else ifeq ($(VERSION), PC_DEBUG)
 CC := gcc
 EXE := \
   ./debug/PES_Project_2.exe
 OBJS := ./debug/PES_Project_2.o
 LL := gcc
-LL_OPTIONS := -g -o $(EXE)
+L_OPTIONS := -g -o $(EXE)
 ./debug/PES_Project_2.o: ./source/PES_Project_2.c   
 	@echo 'Building file: $<'
-	$(CC) -c -std=gnu99 -DPC_DEBUG $(PC_INCLUDES) -MMD -MP -MF"$(@:%.o=%.d)" -MT"$(@:%.o=%.o)" -MT"$(@:%.o=%.d)" -o "$@" "$<" 
+	$(CC) -c -std=gnu99 -DPC_DEBUG $(PC_INCLUDE) -MMD -MP -MF"$(@:%.o=%.d)" -MT"$(@:%.o=%.o)" -MT"$(@:%.o=%.d)" -o "$@" "$<" 
 	@echo 'Finished building: PC_DEBUG $<'
 	@echo ' '
 	
 endif
 
-############################
 # Main (all) target
 all: $(EXE)
-	@echo "*** finished building ***"
+	@echo "*** Building completed ***"
 
-############################
 # Clean target
 clean:
 	-$(RM) $(EXECUTABLES) $(OBJS) $(EXE) 
 	-$(RM) ./debug/*.map
-	@echo "*******Cleaned!*******"
+	@echo "*******Clean completed*******"
 
-############################
-# Rule to link the executable
+# Rule to link executable
 $(EXE): $(OBJS) linkerfile.ld
 	@echo 'Building target: $@'
 	@echo 'Invoking: Linker'
-	$(LL) $(LL_OPTIONS) $(OBJS)
+	$(LL) $(L_OPTIONS) $(OBJS)
 	@echo 'Finished building target: $@'
 	@echo ' '
 
-#############################################
 # Rule to build the files in the CMSIS folder
 ./debug/%.o: ./CMSIS/%.c
 	@echo 'Building file: $<'
-	$(CC) $(CC_OPTIONS) $(B_OPTIONS) $(INCLUDES) -MMD -MP -MF"$(@:%.o=%.d)" -MT"$(@:%.o=%.o)" -MT"$(@:%.o=%.d)" -o "$@" "$<"
-	@echo 'Finished building: $<'
+	$(CC) $(C_OPTIONS) $(B_OPTIONS) $(BOARD_INCLUDE) -MMD -MP -MF"$(@:%.o=%.d)" -MT"$(@:%.o=%.o)" -MT"$(@:%.o=%.d)" -o "$@" "$<"
+	@echo 'Building completed: $<'
 	@echo ' '
 
-#############################################
-# Rule to build the files in the board folder
+# Rule to build files in board folder
 ./debug/%.o: ./board/%.c
 	@echo 'Building file: $<'
-	$(CC) $(CC_OPTIONS) $(B_OPTIONS) $(INCLUDES) -MMD -MP -MF"$(@:%.o=%.d)" -MT"$(@:%.o=%.o)" -MT"$(@:%.o=%.d)" -o "$@" "$<"
-	@echo 'Finished building: $<'
+	$(CC) $(C_OPTIONS) $(B_OPTIONS) $(BOARD_INCLUDE) -MMD -MP -MF"$(@:%.o=%.d)" -MT"$(@:%.o=%.o)" -MT"$(@:%.o=%.d)" -o "$@" "$<"
+	@echo 'Building completed: $<'
 	@echo ' '
 	
-###############################################
-# Rule to build the files in the drivers folder
+# Rule to build files in drivers folder
 ./debug/%.o: ./drivers/%.c
 	@echo 'Building file: $<'
-	$(CC) $(CC_OPTIONS) $(B_OPTIONS) $(INCLUDES) -MMD -MP -MF"$(@:%.o=%.d)" -MT"$(@:%.o=%.o)" -MT"$(@:%.o=%.d)" -o "$@" "$<"
-	@echo 'Finished building: $<'
+	$(CC) $(C_OPTIONS) $(B_OPTIONS) $(BOARD_INCLUDE) -MMD -MP -MF"$(@:%.o=%.d)" -MT"$(@:%.o=%.o)" -MT"$(@:%.o=%.d)" -o "$@" "$<"
+	@echo 'Building completed: $<'
 	@echo ' '
 
-################################################
-# Rule to build the files in the utilities folder
+# Rule to build files in utilities folder
 ./debug/%.o: ./utilities/%.c
 	@echo 'Building file: $<'
-	$(CC) $(CC_OPTIONS) $(B_OPTIONS) $(INCLUDES) -MMD -MP -MF"$(@:%.o=%.d)" -MT"$(@:%.o=%.o)" -MT"$(@:%.o=%.d)" -o "$@" "$<"
-	@echo 'Finished building: $<'
+	$(CC) $(C_OPTIONS) $(B_OPTIONS) $(BOARD_INCLUDE) -MMD -MP -MF"$(@:%.o=%.d)" -MT"$(@:%.o=%.o)" -MT"$(@:%.o=%.d)" -o "$@" "$<"
+	@echo 'Building completed: $<'
 	@echo ' '
 
-###############################################
-# Rule to build the files in the startup folder
+# Rule to build files in startup folder
 ./debug/%.o: ./startup/%.c
 	@echo 'Building file: $<'
-	$(CC) $(CC_OPTIONS) $(B_OPTIONS) $(INCLUDES) -o $@ $<
-	@echo 'Finished building: $<'
+	$(CC) $(C_OPTIONS) $(B_OPTIONS) $(BOARD_INCLUDE) -o $@ $<
+	@echo 'Building completed: $<'
 	@echo ' '
-
-############################ References ################################
-# [1] https://www3.ntu.edu.sg/home/ehchua/programming/cpp/gcc_make.html
-########################################################################
