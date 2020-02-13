@@ -46,21 +46,8 @@ int main(void) {
 #endif
 
 #ifdef FB_RUN
-  	/* Init board hardware. */
-    BOARD_InitBootPins();
-    BOARD_InitBootClocks();
-    BOARD_InitBootPeripherals();
-  	/* Init FSL debug console. */
-    BOARD_InitDebugConsole();
-
-
-    led_init();
-    touch_init();
+    board_init();
 #endif
-//    while(1)
-//    {
-//    	PRINTF("\n\rCap value : %d", touch_scan());
-//    }
 
 
     	led_blink_cap();
@@ -90,5 +77,21 @@ int main(void) {
     }
     return 0 ;
 }
+
+#ifdef FB_RUN
+void board_init(void)
+{
+  	/* Init board hardware. */
+    BOARD_InitBootPins();
+    BOARD_InitBootClocks();
+    BOARD_InitBootPeripherals();
+  	/* Init FSL debug console. */
+    BOARD_InitDebugConsole();
+
+
+    led_init();
+    touch_init();
+}
+#endif
 
 

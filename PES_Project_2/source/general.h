@@ -35,5 +35,5 @@
 #include "led.h"
 #include "time.h"
 /* TODO: insert other definitions and declarations here. */
-
+void board_init(void);
 
