@@ -19,8 +19,8 @@ BOARD_INCLUDE := \
 	-I"utilities"
 
 # Include for PC versions
-PC_INCLUDE := \
-	-I"C:\MinGW\include"
+#PC_INCLUDE := \
+#	-I"C:\MinGW\include"
 	
 
 # Compiler for FB versions (arm compiler)
@@ -124,13 +124,13 @@ else ifeq ($(VERSION), FB_DEBUG)
 
 #PC_RUN version
 else ifeq ($(VERSION), PC_RUN)
-CC := gcc						#MinGW gcc compiler [1]
+CC := gcc						#Linux gcc compiler
 EXE := \
   ./debug/PES_Project_2.exe
 OBJS := ./debug/PES_Project_2.o
 LL := gcc
-L_OPTIONS := -g -o $(EXE)		#Flags for converting an object file into executable file [1] 
-./debug/PES_Project_2.o: ./source/PES_Project_2.c   
+L_OPTIONS := -g -o $(EXE)		#Flags for converting an object file into executable file
+./debug/PES_Project_2.o: ./source/PES_Project_2.c ./source/led.c ./source/time.c -Isource/ -DPC_RUN   
 	@echo 'Building file: $<'
 	$(CC) -c -std=gnu99 -DPC_RUN $(PC_INCLUDE) -MMD -MP -MF"$(@:%.o=%.d)" -MT"$(@:%.o=%.o)" -MT"$(@:%.o=%.d)" -o "$@" "$<" 
 	@echo 'Finished building: PC_RUN $<'
@@ -144,7 +144,7 @@ EXE := \
 OBJS := ./debug/PES_Project_2.o
 LL := gcc
 L_OPTIONS := -g -o $(EXE)
-./debug/PES_Project_2.o: ./source/PES_Project_2.c   
+./debug/PES_Project_2.o: ./source/PES_Project_2.c ./source/led.c ./source/time.c -Isource/ -DPC_RUN   
 	@echo 'Building file: $<'
 	$(CC) -c -std=gnu99 -DPC_DEBUG $(PC_INCLUDE) -MMD -MP -MF"$(@:%.o=%.d)" -MT"$(@:%.o=%.o)" -MT"$(@:%.o=%.d)" -o "$@" "$<" 
 	@echo 'Finished building: PC_DEBUG $<'
@@ -158,7 +158,7 @@ all: $(EXE)
 
 # Clean target
 clean:
-	-$(RM) $(EXECUTABLES) $(OBJS) $(EXE) 
+	-$(RM) $(EXECUTABLES) $(OBJS) $(EXE) $(C_DEPS)
 	-$(RM) ./debug/*.map
 	@echo "*******Clean completed*******"
 

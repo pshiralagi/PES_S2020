@@ -11,6 +11,7 @@
 
 #include "led.h"
 
+#ifdef FB_RUN
 /*	@brief : Function to initialize 3 LEDs as outputs	*/
 void led_init(void)
 {
@@ -45,6 +46,8 @@ void led_init(void)
 #endif
 
 }
+#endif
+
 
 void led_blink_cap()
 {

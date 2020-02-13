@@ -11,6 +11,7 @@
 
 #include "cap_touch.h"
 
+#ifdef FB_RUN
 // TSI initialization function
 void touch_init()
 {
@@ -59,3 +60,5 @@ uint32_t touch_scan(void)
 
 	return (scan - SCAN_OFFSET)*10;
 }
+
+#endif
