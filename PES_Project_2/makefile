@@ -158,7 +158,7 @@ all: $(EXE)
 
 # Clean target
 clean:
-	-$(RM) $(EXECUTABLES) $(OBJS) $(EXE) $(C_DEPS)
+	-$(RM) $(EXECUTABLES) $(OBJS) $(EXE)
 	-$(RM) ./debug/*.map
 	@echo "*******Clean completed*******"
 
