@@ -132,7 +132,7 @@ LL := gcc
 L_OPTIONS := -g -o $(EXE)		#Flags for converting an object file into executable file
 ./debug/PES_Project_2.o: ./source/PES_Project_2.c ./source/led.c ./source/time.c 
 	@echo 'Building file: $<'
-	$(CC) -c -std=gnu99 -DPC_RUN -Isource/time.h -Isource/led.h -Isource/general.h -MMD -MP -MF"$(@:%.o=%.d)" -MT"$(@:%.o=%.o)" -MT"$(@:%.o=%.d)" -o "$@" "$<" 
+	$(CC) -c -std=gnu99 -DPC_RUN -Isource/ -MMD -MP -MF"$(@:%.o=%.d)" -MT"$(@:%.o=%.o)" -MT"$(@:%.o=%.d)" -o "$@" "$<" 
 	@echo 'Finished building: PC_RUN $<'
 	@echo ' '
 	
@@ -146,7 +146,7 @@ LL := gcc
 L_OPTIONS := -g -o $(EXE)
 ./debug/PES_Project_2.o: ./source/PES_Project_2.c ./source/led.c ./source/time.c   
 	@echo 'Building file: $<'
-	$(CC) -c -std=gnu99 -DPC_DEBUG -Isource/time.h -Isource/led.h -Isource/general.h -MMD -MP -MF"$(@:%.o=%.d)" -MT"$(@:%.o=%.o)" -MT"$(@:%.o=%.d)" -o "$@" "$<" 
+	$(CC) -c -std=gnu99 -DPC_DEBUG -Isource/ -MMD -MP -MF"$(@:%.o=%.d)" -MT"$(@:%.o=%.o)" -MT"$(@:%.o=%.d)" -o "$@" "$<" 
 	@echo 'Finished building: PC_DEBUG $<'
 	@echo ' '
 	
