@@ -14,26 +14,27 @@
 #endif
 
 #ifdef PC_DEBUG
-#define PC_RUN
+	#define PC_RUN
 #endif
 
 #ifdef PC_RUN
-#include <stdint.h>
+	#include <stdint.h>
 #endif
 
 #ifdef FB_RUN
-#include "board.h"
-#include "peripherals.h"
-#include "pin_mux.h"
-#include "clock_config.h"
-#include "MKL25Z4.h"
-#include "fsl_debug_console.h"
-#include "cap_touch.h"
+	#include "board.h"
+	#include "peripherals.h"
+	#include "pin_mux.h"
+	#include "clock_config.h"
+	#include "MKL25Z4.h"
+	#include "fsl_debug_console.h"
+	#include "cap_touch.h"
+	void board_init(void);
 #endif
 
 /* TODO: insert other include files here. */
 #include "led.h"
 #include "time.h"
 /* TODO: insert other definitions and declarations here. */
-void board_init(void);
+
 

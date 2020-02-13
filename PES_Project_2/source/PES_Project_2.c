@@ -66,32 +66,30 @@ int main(void) {
     printf("\n\rProgram ending, going to while loop\n\r");
 #endif
 
-    /* Force the counter to be placed into memory. */
-    volatile static int i = 0 ;
+
     /* Enter an infinite loop, just incrementing a counter. */
     while(1) {
-        i++ ;
         /* 'Dummy' NOP to allow source level single stepping of
             tight while() loop */
-        __asm volatile ("nop");
+        ;
     }
     return 0 ;
 }
 
 #ifdef FB_RUN
-void board_init(void)
-{
-  	/* Init board hardware. */
-    BOARD_InitBootPins();
-    BOARD_InitBootClocks();
-    BOARD_InitBootPeripherals();
-  	/* Init FSL debug console. */
-    BOARD_InitDebugConsole();
+	void board_init(void)
+	{
+		/* Init board hardware. */
+		BOARD_InitBootPins();
+		BOARD_InitBootClocks();
+		BOARD_InitBootPeripherals();
+		/* Init FSL debug console. */
+		BOARD_InitDebugConsole();
 
 
-    led_init();
-    touch_init();
-}
+		led_init();
+		touch_init();
+	}
 #endif
 
 

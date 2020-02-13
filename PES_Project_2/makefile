@@ -130,7 +130,7 @@ EXE := \
 OBJS := ./debug/PES_Project_2.o
 LL := gcc
 L_OPTIONS := -g -o $(EXE)		#Flags for converting an object file into executable file
-./debug/PES_Project_2.o: ./source/PES_Project_2.c ./source/led.c ./source/time.c 
+./debug/PES_Project_2.o: ./source/PES_Project_2.c ./source/led.c ./source/time.c
 	@echo 'Building file: $<'
 	$(CC) -c -std=gnu99 -DPC_RUN -Isource/ -MMD -MP -MF"$(@:%.o=%.d)" -MT"$(@:%.o=%.o)" -MT"$(@:%.o=%.d)" -o "$@" "$<" 
 	@echo 'Finished building: PC_RUN $<'
@@ -158,7 +158,7 @@ all: $(EXE)
 
 # Clean target
 clean:
-	-$(RM) $(EXECUTABLES) $(OBJS) $(EXE)
+	-$(RM) $(EXECUTABLES) $(OBJS) $(EXE) $(C_DEPS)
 	-$(RM) ./debug/*.map
 	@echo "*******Clean completed*******"
 
