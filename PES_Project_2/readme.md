@@ -14,22 +14,23 @@ The four modes it can be run in are -
 ### PC_DEBUG - Same as PC_RUN with additional debug statements
 
 The project contains the following source files written by the authors -
-Source:
-	- 'PES_Project_2.c' : Main file containing main routine
+- Source:
+	- 'PES_Project_2.c' : Main file containing main routine. 
 Please see the [PES_Project_2.c file](/source/PES_Project_2.c) for further details.
-	- 'led.c' : File containing LED initializations
+	- 'led.c' : File containing LED initializations. 
 Please see the [led.c file](/source/led.c) for further details.
-	- 'cap_touch.c'	: File containing functions to initialize capacitive touch slider and read values 
+	- 'cap_touch.c'	: File containing functions to initialize capacitive touch slider and read values. 
 Please see the [cap_touch.c file](/source/cap_touch.c) for further details.
-	- 'timer.c' : File containing function to wait in milliseconds for FB modes
+	- 'timer.c' : File containing function to wait in milliseconds for FB modes. 
 Please see the [timer.c file](/source/timer.c) for further details.
 
 The following documentation is also available - 
 - 'readme.md' : Overview file (This file)
-doc:
-	- 'initial_wbs.pdf' : Work breakdown structure before staring the project
+
+- doc:
+	- 'initial_wbs.pdf' : Work breakdown structure before staring the project. 
 Please see the [initial_wbs.pdf file](/doc/initial_wbs.pdf) for further details.
-	- 'final_wbs.pdf' : Work breakdown structure after project completion
+	- 'final_wbs.pdf' : Work breakdown structure after project completion. 
 Please see the [final_wbs.pdf file](/doc/final_wbs.pdf) for further details.
 
 Each source file has its own header file.
