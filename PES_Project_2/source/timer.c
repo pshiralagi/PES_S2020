@@ -1,8 +1,8 @@
 
-#include "time.h"
+#include <timer.h>
 void wait_ms(volatile uint32_t time)
 {
-	time = time*1000;
+	time = time*4250;	//Values tested on oscilloscope
 	for (time; time!=0; time--)
 	{
 		__asm("nop"); //No operation

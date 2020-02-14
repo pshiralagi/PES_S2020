@@ -4,9 +4,12 @@
 #	@description : Makefile to build project for four different configurations, two configrations
 #					run on the board and two on the PC
 #	@references : https://www3.ntu.edu.sg/home/ehchua/programming/cpp/gcc_make.html	\
-				  https://github.com/ErichStyger/mcuoneclipse/tree/master/Examples/MCUXpresso/FRDM-KL25Z/MyMakeProject
+				  https://github.com/ErichStyger/mcuoneclipse/tree/master/Examples/MCUXpresso/FRDM-KL25Z/MyMakeProject \
+				  https://mcuoneclipse.com/2017/07/22/tutorial-makefile-projects-with-eclipse/
+#	@note : Most of the code has been taken from the reference listed above and from other makefiles generated on MCUXpresso \
+			The entire linker file has been taken from the repository listed in references
 
-# Command for removing files
+# Cleaning out files
 RM := rm -rf
 
 
@@ -19,8 +22,8 @@ BOARD_INCLUDE := \
 	-I"utilities"
 
 # Include for PC versions
-#PC_INCLUDE := \
-#	-I"C:\MinGW\include"
+PC_INCLUDE := \
+	-I"source"
 	
 
 # Compiler for FB versions (arm compiler)
@@ -35,16 +38,13 @@ EXE := \
 
 # List of object files for FB versions
 OBJS := \
-	./debug/PES_Project_2.o \
-	./debug/led.o \
-	./debug/cap_touch.o \
-	./debug/time.o \
 	./debug/startup_mkl25z4.o \
 	./debug/system_MKL25Z4.o	\
-	./debug/board.o \
 	./debug/clock_config.o \
 	./debug/peripherals.o \
 	./debug/pin_mux.o \
+	./debug/timer.o \
+	./debug/board.o \
 	./debug/fsl_clock.o \
 	./debug/fsl_common.o \
 	./debug/fsl_flash.o \
@@ -52,7 +52,11 @@ OBJS := \
 	./debug/fsl_lpsci.o \
 	./debug/fsl_smc.o \
 	./debug/fsl_uart.o \
-	./debug/fsl_debug_console.o
+	./debug/fsl_debug_console.o \
+	./debug/PES_Project_2.o \
+	./debug/led.o \
+	./debug/cap_touch.o 
+
 	
 # List of dependency files 
 C_DEPS = \
@@ -124,15 +128,15 @@ else ifeq ($(VERSION), FB_DEBUG)
 
 #PC_RUN version
 else ifeq ($(VERSION), PC_RUN)
-CC := gcc						#Linux gcc compiler
+CC := gcc
 EXE := \
   ./debug/PES_Project_2.exe
 OBJS := ./debug/PES_Project_2.o
 LL := gcc
-L_OPTIONS := -g -o $(EXE)		#Flags for converting an object file into executable file
-./debug/PES_Project_2.o: ./source/PES_Project_2.c ./source/led.c ./source/time.c
+L_OPTIONS := -g -o $(EXE)
+./debug/%.o: ./source/%.c 
 	@echo 'Building file: $<'
-	$(CC) -c -std=gnu99 -DPC_RUN -Isource/ -MMD -MP -MF"$(@:%.o=%.d)" -MT"$(@:%.o=%.o)" -MT"$(@:%.o=%.d)" -o "$@" "$<" 
+	$(CC) -c -std=gnu99 -DPC_RUN -MMD -MP -MF"$(@:%.o=%.d)" -MT"$(@:%.o=%.o)" -MT"$(@:%.o=%.d)" -o "$@" "$<" 
 	@echo 'Finished building: PC_RUN $<'
 	@echo ' '
 	
@@ -144,9 +148,9 @@ EXE := \
 OBJS := ./debug/PES_Project_2.o
 LL := gcc
 L_OPTIONS := -g -o $(EXE)
-./debug/PES_Project_2.o: ./source/PES_Project_2.c ./source/led.c ./source/time.c   
+./debug/%.o: ./source/%.c 
 	@echo 'Building file: $<'
-	$(CC) -c -std=gnu99 -DPC_DEBUG -Isource/ -MMD -MP -MF"$(@:%.o=%.d)" -MT"$(@:%.o=%.o)" -MT"$(@:%.o=%.d)" -o "$@" "$<" 
+	$(CC) -c -std=gnu99 -DPC_DEBUG -MMD -MP -MF"$(@:%.o=%.d)" -MT"$(@:%.o=%.o)" -MT"$(@:%.o=%.d)" -o "$@" "$<" 
 	@echo 'Finished building: PC_DEBUG $<'
 	@echo ' '
 	
@@ -160,7 +164,7 @@ all: $(EXE)
 clean:
 	-$(RM) $(EXECUTABLES) $(OBJS) $(EXE) $(C_DEPS)
 	-$(RM) ./debug/*.map
-	@echo "*******Clean completed*******"
+	@echo "***Clean completed***"
 
 # Rule to link executable
 $(EXE): $(OBJS) linkerfile.ld

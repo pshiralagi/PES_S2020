@@ -19,7 +19,12 @@
 
 #ifdef PC_RUN
 	#include <stdint.h>
+	#include <time.h>
+	#include <stdlib.h>
+	void pc_wait(uint16_t wait_time);
 #endif
+
+void led_blink_cap(void);
 
 #ifdef FB_RUN
 	#include "board.h"
@@ -29,12 +34,14 @@
 	#include "MKL25Z4.h"
 	#include "fsl_debug_console.h"
 	#include "cap_touch.h"
+	#include <timer.h>
+	#include "led.h"
 	void board_init(void);
 #endif
 
 /* TODO: insert other include files here. */
-#include "led.h"
-#include "time.h"
+
+
 /* TODO: insert other definitions and declarations here. */
 
 

@@ -7,8 +7,8 @@
  *    	@author : pshiralagi
  */
 
-#ifndef time_h
-#define time_h
+#ifndef timer_h
+#define timer_h
 #include "general.h"
 
 

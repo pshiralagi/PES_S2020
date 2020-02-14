@@ -21,6 +21,5 @@
 	#define BLUE_LED_PIN  (1)	//Pin 1, Port D
 	#define MASK(x) (1UL << (x))
 #endif
-void led_blink_cap(void);
 
 #endif

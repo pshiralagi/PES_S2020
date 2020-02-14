@@ -12,7 +12,7 @@
 #include "cap_touch.h"
 
 #ifdef FB_RUN
-// TSI initialization function
+/*	@brief : Touch sensor initializations	*/
 void touch_init()
 {
 #ifdef FB_DEBUG
@@ -21,7 +21,7 @@ void touch_init()
 	// Enable clock for TSI PortB 16 and 17
 	SIM->SCGC5 |= SIM_SCGC5_TSI_MASK;
 
-
+	/* GENCS is the general control and status register	*/
 	TSI0->GENCS = TSI_GENCS_OUTRGF_MASK |  // Out of range flag, set to 1 to clear
 								//TSI_GENCS_ESOR_MASK |  // This is disabled to give an interrupt when out of range.  Enable to give an interrupt when end of scan
 								TSI_GENCS_MODE(0u) |  // Set at 0 for capacitive sensing.  Other settings are 4 and 8 for threshold detection, and 12 for noise detection
@@ -38,15 +38,9 @@ void touch_init()
 								TSI_GENCS_EOSF_MASK ; // End of scan flag, set to 1 to clear
 								//TSI_GENCS_CURSW_MASK; // Do not swap current sources
 
-
-	// The TSI threshold isn't used is in this application
-//	TSI0->TSHD = 	TSI_TSHD_THRESH(0x00) |
-//								TSI_TSHD_THRESL(0x00);
-
-
 }
 
-// Function to read touch sensor from low to high capacitance for left to right
+/*	@brief : Function to read touch sensor from low to high capacitance for left to right	*/
 uint32_t touch_scan(void)
 {
 #ifdef FB_DEBUG
@@ -55,7 +49,10 @@ uint32_t touch_scan(void)
 	uint16_t scan;
 	TSI0->DATA = 	TSI_DATA_TSICH(10u); // Using channel 10 of The TSI
 	TSI0->DATA |= TSI_DATA_SWTS_MASK; // Software trigger for scan
+
+	/*	Accessing the bits held in TSI0_DATA_TSICNT	*/
 	scan = SCAN_DATA;
+
 	TSI0->GENCS |= TSI_GENCS_EOSF_MASK ; // Reset end of scan flag
 
 	return (scan - SCAN_OFFSET)*10;
