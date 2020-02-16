@@ -4,7 +4,7 @@
  *  @date : Feb 6, 2020
  *  @description : Header file for led.c
  *
- *    	@author : pshiralagi
+ *    	@author : Pavan Shiralagi and Antara Prakash
  */
 
 #ifndef led_h_

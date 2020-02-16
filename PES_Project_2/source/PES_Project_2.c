@@ -31,6 +31,7 @@
 /**
  * @file    PES_Project_2.c
  * @brief   Application entry point.
+ * @date 	4th February, 2020
  * @author	Pavan Shiralagi and Antara Prakash
  */
 #include "general.h"
@@ -134,7 +135,7 @@ void led_blink_cap(void)
 	#endif
 			for(loop = 0; loop < 4; loop++)
 			{
-				if(cap_val < 6001)
+				if(cap_val < 6001)// Approximate values, not accurate because of short sampling times
 				{
 			#ifdef FB_DEBUG
 					PRINTF("\n\rSwitching red LED on");

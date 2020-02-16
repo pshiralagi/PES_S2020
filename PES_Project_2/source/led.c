@@ -5,7 +5,7 @@
  *  @description : File containing led functions
  *
  *		@reference : https://github.com/alexander-g-dean/ESF/edit/master/Code/Chapter_2/Source/main.c
- *    	@author : pshiralagi
+ *    	@author : Pavan Shiralagi and Antara Prakash
  *
  */
 
