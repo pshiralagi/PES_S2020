@@ -46,6 +46,7 @@ Each source file has its own header file.
 
 All modes can be executed from MCUXpresso using custom makefile. 
 Platform - MCUXpresso
+To use custom makefile, disable autogeneration of makefiles for the project and add the gcc compiler as an environmet variable on MCUXpresso.
 
 ### For FB modes
 Compiler used - arm-none-eabi-gcc
@@ -56,7 +57,7 @@ Debug statements viewed on Realterm. Baud rate - 115200
 Compiler used - gcc
 MinGW is required to use gcc from Windows systems.  The environment vairable mus tbe added to the path and gcc can be verified on cmd line.
 MinGW must also be added to the path in MCUXpresso.
-An executable file is created in the debug folder and can then be run on command line.
+An executable file is created in the debug folder which can then be run on command line.
 The PC mode can also be run on Ubuntu using the `make VERSION=PC_RUN` or `make VERSION=PC_DEBUG`
 
 **If facing problems while generating executable files, delete all contents of the debug folder and then re-build**

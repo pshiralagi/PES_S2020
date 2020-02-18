@@ -2,7 +2,7 @@
  * @filename : led.c
  *
  *  @date : Feb 6, 2020
- *  @description : File containing led functions
+ *  @description : File containing led initializations
  *
  *		@reference : https://github.com/alexander-g-dean/ESF/edit/master/Code/Chapter_2/Source/main.c
  *    	@author : Pavan Shiralagi and Antara Prakash

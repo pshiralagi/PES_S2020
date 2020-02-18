@@ -50,13 +50,6 @@ int main(void) {
     board_init();//Board initialization function
 #endif
 
-//    To check cap_vals being read
-//    while(1)
-//    {
-//    	wait_ms(3000);
-//    	PRINTF("\n\r%d", touch_scan());
-//    }
-
     	led_blink_cap();	//Function to blink LED based on requirements
 
 
@@ -117,7 +110,7 @@ int main(void) {
 void led_blink_cap(void)
 {
 	uint32_t cap_val;
-
+	bool check_val = 1;
 	uint8_t loop, count;//Initializing to 0 only once
 #ifdef PC_RUN
 	uint8_t ledTrig = 0, LED_G, LED_B, LED_R = 1, loop_no = 1;//Initializing values only once
@@ -128,28 +121,29 @@ void led_blink_cap(void)
 #ifdef FB_RUN
 		for (count = 0; count < 10; count++)
 		{
-			cap_val = touch_scan();//Obtaining capavitance slider value
+			if (check_val == 1)
+				cap_val = touch_scan();//Obtaining capavitance slider value
 	#ifdef FB_DEBUG
 			PRINTF("\n\rLoop number : %d", count);
 			PRINTF("\n\rTouch value is %d",cap_val);
 	#endif
 			for(loop = 0; loop < 4; loop++)
 			{
-				if(cap_val < 6001)// Approximate values, not accurate because of short sampling times
+				if(cap_val < 5001)// Approximate values, not accurate because of short sampling times
 				{
 			#ifdef FB_DEBUG
 					PRINTF("\n\rSwitching red LED on");
 			#endif
 					PTB->PCOR = MASK(RED_LED_PIN);
 				}
-				if((cap_val > 6000 ) & (cap_val < 12501 ))
+				if((cap_val > 5000 ) & (cap_val < 14501 ))
 				{
 			#ifdef FB_DEBUG
 					PRINTF("\n\rSwitching green LED on");
 			#endif
 					PTB->PCOR = MASK(GREEN_LED_PIN);
 				}
-				if(cap_val > 12500)
+				if(cap_val > 14500)
 				{
 			#ifdef FB_DEBUG
 					PRINTF("\n\rSwitching blue LED on");
@@ -173,6 +167,7 @@ void led_blink_cap(void)
 			#endif
 
 				wait_ms(500);
+				check_val = !check_val;
 			}
 
 
