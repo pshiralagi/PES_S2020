@@ -110,7 +110,9 @@ int main(void) {
 void led_blink_cap(void)
 {
 	uint32_t cap_val;
+#ifdef FB_RUN
 	bool check_val = 1;
+#endif
 	uint8_t loop, count;//Initializing to 0 only once
 #ifdef PC_RUN
 	uint8_t ledTrig = 0, LED_G, LED_B, LED_R = 1, loop_no = 1;//Initializing values only once
