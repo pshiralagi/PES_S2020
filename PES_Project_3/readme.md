@@ -14,21 +14,21 @@ Please see the [PES_Project_3.c file](./source/PES_Project_3.c) for further deta
 	- 'led.c' : File containing LED initializations. 
 Please see the [led.c file](./source/led.c) for further details.
 	- 'allocate_bytes.c'	: File containing functions to allocate bytes to the memory. 
-Please see the [memory.c file](./source/memory.c) for further details.
+Please see the [allocate_bytes.c file](./source/allocate_bytes.c) for further details.
 	- 'memory.c'	: File containing functions to allocate data to a memory location. 
-Please see the [pattern.c file](./source/pattern.c) for further details.
+Please see the [memory.c file](./source/memory.c) for further details.
 	- 'pattern.c' : File containing function to manipulate pattern in the memory. 
-Please see the [logger.c file](./source/logger.c) for further details.
+Please see the [pattern.c file](./source/pattern.c) for further details.
 	- 'logger.c'	: File containing functions to log data. 
-Please see the [UnitTest.c file](./source/UnitTest.c) .
+Please see the [logger.c file](./source/logger.c) .
 	- 'UnitTest.c' : File containing function unit test for the system. 
-Please see the [timer.c file](./source/timer.c) for further details.
+Please see the [UnitTest.c file](./source/UnitTest.c) for further details.
 
 The following documentation is also available - 
 - 'readme.md' : Overview file (This file)
 
 - doc:
-	- 'UML.pdf' : UML diagram before staring the project. 
+	- 'UML.pdf' : UML diagram for main flow and write pattern test (2 seperate UML diagrams).
 Please see the [UML.pdf file](./doc/UML.pdf) for further details.
 
 Each source file has its own header file.
