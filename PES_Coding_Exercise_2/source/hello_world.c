@@ -93,8 +93,8 @@ for (int num = 0; num < 4; num++)
 
 void Init_SysTick(void)
 {
-	//Interrupt at 3Hz
-	SysTick->LOAD = (48000000L/144);
+	//Loading 3MHz
+	SysTick->LOAD = (48000000L/16);
 	NVIC_SetPriority(SysTick_IRQn, 3);
 	SysTick->VAL = 0;
 	SysTick->CTRL = SysTick_CTRL_TICKINT_Msk | SysTick_CTRL_ENABLE_Msk;
@@ -103,15 +103,7 @@ void Init_SysTick(void)
 void SysTick_Handler()
 {
 	static int n=1;
-	if (n == 3)
-	{
-		Control_RGB_LEDs(1,1,1);//On every 1 second
-	}
-	if (n == 6)
-	{
-		Control_RGB_LEDs(0,0,0);//Off every 1 second
-		n = 0;
-	}
+	Control_RGB_LEDs(n&1,n&1,n&1);
 	n++;
 }
 
