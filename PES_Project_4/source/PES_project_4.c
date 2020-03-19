@@ -11,7 +11,7 @@
  *	3. Add POST_test
  *	4. Add LED control (blue LED on in POST_test, green in normal states, red if LIS 331 is disconnected
  *	5. Read accelerometer using SPI in fsm_3 (create spi.c and spi.h files) - Loopback
- *	6. Logger Extensions (create logger.c and logger.h files) (apparently you ned to build on work done for project 3)
+ *	6. Logger Extensions (create logger.c and logger.h files) (apparently you need to build on work done for project 3)
  *	7. Add CUnittests (in test mode)
  *	8. Add debug messages using logger (debug mode)
  *	9. Add those defines in general.h
