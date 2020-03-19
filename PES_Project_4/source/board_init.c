@@ -18,7 +18,10 @@ void board_init(void)
 	BOARD_InitBootPeripherals();
 	/* Init FSL debug console. */
 	BOARD_InitDebugConsole();
-
+	interrupt_clear = 0;
+	state_machine_1 = 1;
+	state_machine_2 = 0;
+	state_machine_3 = 0;
 
 	led_init();
 	touch_init();

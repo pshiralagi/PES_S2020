@@ -26,3 +26,8 @@
 #include "timer.h"
 #include "led.h"
 #include "board_init.h"
+#include "fsm.h"
+
+bool state_machine_1, state_machine_2, state_machine_3;
+uint8_t interrupt_clear;
+
