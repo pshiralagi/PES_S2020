@@ -79,6 +79,7 @@ void fsm_2(void)
 	{
 
 		(*fsm_2_ptr_arr[current_state]);
+		current_state++;
 		/*	If sensor is is disconnected in i2c_interrupt_read	*/
 //		current_sate = 4;
 	}
@@ -102,6 +103,7 @@ void fsm_3(void)
 	{
 
 		(*fsm_3_ptr_arr[current_state]);
+		current_state++;
 		/*	If sensor is is disconnected in i2c_interrupt_read	*/
 //		current_sate = 4;
 	}

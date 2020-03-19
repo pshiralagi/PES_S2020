@@ -9,7 +9,7 @@
  *	1. Add i2c_polling function in fsm_1 (create i2c.c and i2c.h files) - On board
  *	2. Add i2c interrupt function in fsm_2
  *	3. Add POST_test
- *	4. Add LED control (blue LED on in POST_test, green in normal states, red if LIS 331 is disconnected
+ *	4. Add LED control (blue LED on in POST_test, green in normal states, red if LIS 331 is disconnected)
  *	5. Read accelerometer using SPI in fsm_3 (create spi.c and spi.h files) - Loopback
  *	6. Logger Extensions (create logger.c and logger.h files) (apparently you need to build on work done for project 3)
  *	7. Add CUnittests (in test mode)
