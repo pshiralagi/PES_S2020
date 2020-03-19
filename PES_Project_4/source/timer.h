@@ -15,6 +15,8 @@
 
 void wait_ms(uint32_t time);
 void cap_delay_ticks(unsigned ticks);
+void SysTick_delay(uint8_t seconds);
+void SysTick_Handler();
 
 
 static inline void delay_ms(uint16_t ms)

@@ -113,7 +113,14 @@ void fsm_3(void)
 void state_decision(void)
 {
 	state_count++;
-	delay_ms(3000);
+//	delay_ms(3000);
+	SysTick_delay(3);
+	while (interrupt_clear == false)
+	{
+		cap_val = touch_scan();	//Obtaining capacitance slider value
+	}
+	interrupt_clear = false;
+
 	if ((state_count == 6) | (cap_val < 5001))
 	{
 		if(state_count == 6)

@@ -15,6 +15,7 @@
  *	7. Add CUnittests (in test mode)
  *	8. Add debug messages using logger (debug mode)
  *	9. Add those defines in general.h
+ *	10. Check if the systick irq initialization stuff makes sense
  *
  *	Moi :
  *	10. Take and annotate scope measurements for i2c

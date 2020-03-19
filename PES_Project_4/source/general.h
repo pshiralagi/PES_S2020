@@ -29,5 +29,5 @@
 #include "fsm.h"
 
 bool state_machine_1, state_machine_2, state_machine_3;
-uint8_t interrupt_clear;
+bool interrupt_clear;
 

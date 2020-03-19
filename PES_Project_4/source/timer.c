@@ -40,3 +40,20 @@ void cap_delay_ticks(unsigned ticks)
     	}
     SysTick->CTRL = 0;
 }
+
+void SysTick_delay(uint8_t seconds)
+{
+	//Interrupt at 3s
+	SysTick->LOAD = seconds*(48000000L/16);
+	NVIC_EnableIRQ(SysTick_IRQn);
+	NVIC_SetPriority(SysTick_IRQn, 3);
+	SysTick->VAL = 0;
+	SysTick->CTRL = SysTick_CTRL_TICKINT_Msk | SysTick_CTRL_ENABLE_Msk;
+}
+
+
+void SysTick_Handler()
+{
+	interrupt_clear = true;
+	NVIC_DisableIRQ(SysTick_IRQn);
+}
