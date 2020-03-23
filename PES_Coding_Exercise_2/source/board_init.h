@@ -14,6 +14,4 @@
 
 void board_init(void);
 
-extern bool interrupt_clear;
-
 #endif

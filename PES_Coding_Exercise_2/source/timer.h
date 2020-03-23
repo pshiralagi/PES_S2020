@@ -19,9 +19,9 @@ void SysTick_delay(uint8_t seconds);
 void SysTick_Handler();
 
 
-//static inline void delay_ms(uint16_t ms)
-//{
-//    cap_delay_ticks((ms * (STM32_SYSCLK / 8)) / 1000);
-//}
+static inline void delay_ms(uint16_t ms)
+{
+    cap_delay_ticks((ms * (STM32_SYSCLK / 8)) / 1000);
+}
 
 #endif

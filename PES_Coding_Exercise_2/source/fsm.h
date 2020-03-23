@@ -21,7 +21,7 @@ typedef enum {
 	numStates
 }stateMachine_1;//States for first state machine
 
-
+uint8_t current_state;
 void display_data(void);
 void sort_data(void);
 void program_end(void);
@@ -29,7 +29,7 @@ void fsm_1(void);
 void fsm_2(void);
 void fsm_3(void);
 void state_decision(void);
-extern bool state_machine_1, state_machine_2, state_machine_3;
+
 
 
 #endif

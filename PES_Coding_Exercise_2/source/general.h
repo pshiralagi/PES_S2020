@@ -14,6 +14,8 @@
 //#define PC_DEBUG 1	//Debug version of PC_RUN with a lot more debug statements
 /*****************************************************************************/
 
+#ifndef GENERAL_H_
+#define GENERAL_H_
 
 #include <stdio.h>
 #include "board.h"
@@ -28,6 +30,9 @@
 #include "board_init.h"
 #include "fsm.h"
 
+extern bool state_machine_1, state_machine_2, state_machine_3;
+extern bool interrupt_clear;
+extern volatile uint32_t cap_val;
 
 
-
+#endif

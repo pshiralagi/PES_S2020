@@ -9,10 +9,8 @@
 
 #include "fsm.h"
 
-static uint8_t current_state;
-volatile uint32_t cap_val;
 stateMachine_1 fsm1;
-bool interrupt_clear;
+
 static uint8_t x[250], y[250], z[250];
 static uint8_t x_avg = 0, x_max = 0, x_min = 0;
 static uint8_t y_avg = 0, y_max = 0, y_min = 0;
@@ -92,12 +90,7 @@ void fsm_2(void)
 
 void fsm_3(void)
 {
-	/*Function to read accelerometer data based on interrupt i2c method, store data in x[], y[] etc. (same as above)	*/
-//	static void (*i2c_read_accelerometer_ptr) = &i2c_interrupt_accelerometer;
-//	static void (*dataSort) = &sort_data;
-//	static void (*dataDisplay) = &display_data;
-//	static void (*nextStateDecision) = &state_decision;
-//	static void (*endProgram) = &program_end;
+
 	current_state = 0;
 	void (*fsm_3_ptr_arr[]) = {&sort_data, &display_data, &state_decision, &program_end};
 

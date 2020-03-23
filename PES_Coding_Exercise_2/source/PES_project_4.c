@@ -29,7 +29,7 @@
  *
  */
 #include "general.h"
-bool state_machine_1, state_machine_2, state_machine_3;
+
 int main(void)
 {
 	board_init();

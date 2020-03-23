@@ -9,8 +9,6 @@
  */
 
 #include "board_init.h"
-
-
 /*	@brief : Function consisting necessary board initializations	*/
 void board_init(void)
 {
