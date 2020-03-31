@@ -29,6 +29,8 @@ void fsm_1(void);
 void fsm_2(void);
 void fsm_3(void);
 void state_decision(void);
+void i2c_interrupt_accelerometer(void);
+void spi_count(void);
 extern bool state_machine_1, state_machine_2, state_machine_3;
 
 

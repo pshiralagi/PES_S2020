@@ -30,11 +30,16 @@
  */
 #include "general.h"
 bool state_machine_1, state_machine_2, state_machine_3;
+
 int main(void)
 {
 	board_init();
-//	POST_test();
-
+	Start_Test();
+	i2c_init();
+	init_mma();
+	Init_SPI1();
+	//	POST_test();
+	//If POST test fails, call program end function
 	while(state_machine_1 | state_machine_2 | state_machine_3)
 	{
 		fsm_1();

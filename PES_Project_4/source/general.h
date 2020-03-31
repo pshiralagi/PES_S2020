@@ -14,8 +14,22 @@
 //#define PC_DEBUG 1	//Debug version of PC_RUN with a lot more debug statements
 /*****************************************************************************/
 
+#ifndef general_h_
+#define general_h_
 
 #include <stdio.h>
+
+//#define TEST_MODE
+//#define DEBUG_MODE
+#define STATUS
+
+#ifdef TEST_MODE
+#define DEBUG_MODE
+#include "uCUnit.h"
+#endif
+
+
+
 #include "board.h"
 #include "peripherals.h"
 #include "pin_mux.h"
@@ -27,7 +41,13 @@
 #include "led.h"
 #include "board_init.h"
 #include "fsm.h"
+#include "log.h"
+#include "spi.h"
+#include "i2c.h"
+#include "acc.h"
 
+
+#endif
 
 
 

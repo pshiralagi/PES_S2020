@@ -20,5 +20,14 @@ void led_init(void);
 #define BLUE_LED_PIN  (1)	//Pin 1, Port D
 #define MASK(x) (1UL << (x))
 
+void red_led_on(void);
+void blue_led_on(void);
+void green_led_on(void);
+void red_led_off(void);
+void blue_led_off(void);
+void green_led_off(void);
+void Start_Test(void);
+void Success_Test(void);
+void Fail_Test(void);
 
 #endif

@@ -52,8 +52,9 @@ void SysTick_delay(uint8_t seconds)
 }
 
 
-void SysTick_Handler()
+void SysTick_Handler(void)
 {
 	interrupt_clear = true;
+
 	NVIC_DisableIRQ(SysTick_IRQn);
 }
