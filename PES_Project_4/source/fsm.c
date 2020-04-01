@@ -14,11 +14,12 @@ volatile uint32_t cap_val;
 stateMachine_1 fsm1;
 bool interrupt_clear;
 static uint16_t x[10], y[10], z[10];
-static uint16_t x_avg = 0, x_max = 0, x_min = 0;
-static uint16_t y_avg = 0, y_max = 0, y_min = 0;
-static uint16_t z_avg = 0, z_max = 0, z_min = 0;
-static uint16_t state_count = 0;
+static uint16_t x_avg = 0, x_max = 0, x_min = 0, x_curr = 0;
+static uint16_t y_avg = 0, y_max = 0, y_min = 0, y_curr = 0;
+static uint16_t z_avg = 0, z_max = 0, z_min = 0, z_curr = 0;
+static uint8_t state_count = 0;
 static uint16_t spi_loop = 0;
+static uint32_t sum_x = 0, sum_y = 0, sum_z = 0;
 
 /* @brief : State driven state machine is used for fsm_1 with a polling method of reading I2C values	*/
 void fsm_1(void)
@@ -76,6 +77,9 @@ void fsm_1(void)
 	}
 }
 
+/*
+ * @brief	fsm2 is the same as fsm1 but uses a table driven state machine to implement interrupt driven i2c
+ */
 void (*fsm_2_ptr_arr[5])() = {i2c_interrupt_accelerometer, sort_data, display_data, state_decision, program_end};
 void fsm_2(void)
 {
@@ -96,6 +100,9 @@ void fsm_2(void)
 
 
 }
+/*
+ * @brief	fsm3 uses a table driven state machine to implement SPI loopback
+ */
 void (*fsm_3_ptr_arr[2])() = {spi_count, state_decision};
 void fsm_3(void)
 {
@@ -121,6 +128,9 @@ void fsm_3(void)
 
 }
 
+/*
+ * @brief	SPI loopback function
+ */
 void spi_count(void){
 	if(Test_SPI_Loopback()){
 		Success_Test();
@@ -132,6 +142,9 @@ void spi_count(void){
 	}
 }
 
+/*
+ * @brief	interrupt driven i2c
+ */
 void i2c_interrupt_accelerometer(){
 	I2C_Master_Transmit();
 	x[state_count] =	acc_X;
@@ -139,12 +152,16 @@ void i2c_interrupt_accelerometer(){
 	z[state_count] =	acc_Z;
 }
 
+/*
+ * @brief Making a decision on next state based on previous state, state machine number and capacitive touch value
+ */
 void state_decision(void)
 {
 	#ifdef DEBUG_MODE
 		log_func_Str(DebugMode, statedecision, "Green LED is on");
 	#endif
-	state_count++;
+	if(state_machine_1 | state_machine_2)
+		state_count++;
 //	delay_ms(3000);
 	SysTick_delay(3);
 	while (interrupt_clear == false)
@@ -160,11 +177,14 @@ void state_decision(void)
 	}
 	interrupt_clear = false;
 
-	if ((state_count == 6) | (cap_val < 5001))
+	if ((state_count == 6) | (cap_val < 5001) | (cap_val > 500))
 	{
 		if(state_count == 6)
 		{
 			state_count = 0;
+			sum_x = 0;
+			sum_y = 0;
+			sum_z = 0;
 		}
 		if (state_machine_1)
 		{
@@ -199,6 +219,10 @@ void state_decision(void)
 
 	}
 }
+
+/*
+ * @brief	Function to display accelerometer data
+ */
 void display_data(void)
 {
 	#ifdef DEBUG_MODE
@@ -206,27 +230,34 @@ void display_data(void)
 	#endif
 
 	printf("\n\rState Count = %d", state_count);
-	printf("\n\rLatest Accelerometer Readings - \n\rX | Y | Z \n\r%d | %d | %d", x[state_count], y[state_count], z[state_count]);
+	printf("\n\rLatest Accelerometer Readings - \n\rX | Y | Z \n\r%d | %d | %d", x_curr, y_curr, z_curr);
 	printf("\n\rAverage Accelerometer Readings - \n\rX | Y | Z \n\r%d | %d | %d", x_avg, y_avg, z_avg);
 	printf("\n\rMinimum Accelerometer Readings - \n\rX | Y | Z \n\r%d | %d | %d", x_min, y_min, z_min);
 	printf("\n\rMax Accelerometer Readings - \n\rX | Y | Z \n\r%d | %d | %d", x_max, y_max, z_max);
 }
 
+/*
+ * @brief	Function to sort accelerometer data
+ */
 void sort_data(void)
 {
 	#ifdef DEBUG_MODE
 	log_func_Str(DebugMode, sortdata, "Green LED is on");
 	#endif
+	x_curr = acc_X;
+	y_curr = acc_Y;
+	z_curr = acc_Z;
 
+	sum_x += x_curr;
+	sum_y += y_curr;
+	sum_z += z_curr;
 	static uint8_t i = 0, j = 0;
-	uint16_t sum_x = 0, sum_y = 0, sum_z = 0, a = 0;
-		for (i = 0; i <= state_count; ++i)
+	static uint16_t a = 0;
+		for (i = 0; i <= state_count; i++)
 		{
-			sum_x += x[i];
-			sum_y += y[i];
-			sum_z += z[i];
 
-			for (j = i + 1; j < state_count; ++j)
+
+			for (j = i + 1; j <= state_count; j++)
 			{
 
 				if (x[i] > x[j])
@@ -256,6 +287,7 @@ void sort_data(void)
 
 			}
 	}
+
 	x_max = x[state_count];
 	x_min = x[0];
 	x_avg = (sum_x/(state_count+1));
@@ -270,6 +302,9 @@ void sort_data(void)
 
 }
 
+/*
+ * @brief	Function to end program
+ */
 void program_end(void)
 {
 	state_machine_1 = 0;

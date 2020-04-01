@@ -1,8 +1,8 @@
 /*
- * acc.h
+ * @file	acc.h
  *
- *  Created on: Mar 21, 2020
- *      Author: praka
+ *  @date	 Mar 21, 2020
+ *      @author	 aprakash, pshiralagi
  */
 
 #ifndef ACC_H_
@@ -28,7 +28,8 @@
 #define COUNTS_PER_G (4096.0)
 #define M_PI (3.14159265)
 
-int init_mma(void);
+void init_mma(void);
+void acc_init(void);
 void read_full_xyz(void);
 void read_xyz(void);
 void convert_xyz_to_roll_pitch(void);
@@ -38,6 +39,6 @@ uint16_t ready(void);
 uint16_t readz(void);
 
 extern float roll, pitch;
-extern int16_t acc_X, acc_Y, acc_Z;
+extern volatile uint16_t acc_X, acc_Y, acc_Z;
 
 #endif /* ACC_H_ */

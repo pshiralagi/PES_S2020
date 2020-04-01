@@ -1,8 +1,9 @@
 /*
- * acc.c
+ * @file	acc.c
  *
- *  Created on: Mar 21, 2020
- *      Author: praka
+ *  @date: Mar 21, 2020
+ *      @author: aprakash, pshiralagi
+ *      @brief	Functions to interract with on board accelerometer
  */
 
 
@@ -10,21 +11,32 @@
 #include "acc.h"
 
 
-int16_t acc_X=0, acc_Y=0, acc_Z=0;
+volatile uint16_t acc_X=0, acc_Y=0, acc_Z=0;
 float roll=0.0, pitch=0.0;
 
 //mma data ready
 extern uint32_t DATA_READY;
 
 
+/*
+ * @brief	Initialize communication with accelerometer (test)
+ */
+void acc_init(void)
+{
+	init_mma();
+	read_full_xyz();
+	i2c_interrupt_accelerometer();
 
-//initializes mma8451 sensor
-//i2c has to already be enabled
-int init_mma(void)
+}
+
+/*
+ * @brief	initializes mma8451 sensor
+ */
+
+void init_mma(void)
 {
 	//set active mode, 14 bit samples and 800 Hz ODR
 	i2c_write_byte(MMA_ADDR, REG_CTRL1, 0x01);
-	return 1;
 }
 
 /*********Interrupt based accelerometer read**********/
@@ -74,7 +86,7 @@ void read_full_xyz()
 	int i;
 	uint8_t data[6];
 	int16_t temp[3];
-
+	init_mma();
 	i2c_start();
 	i2c_read_setup(MMA_ADDR , REG_XHI);
 
@@ -123,28 +135,3 @@ void read_xyz(void)
 	wait_ms(100);
 	PRINTF("    z:%d", acc_Z);
 }
-
-/*void read_xyz_int(void)
-{
-	// sign extend byte to 16 bits - need to cast to signed since function
-	// returns uint8_t which is unsigned
-	acc_X = (int8_t) I2C_Master_Transmit(MMA_ADDR, REG_XHI);
-	wait_ms(100);
-	PRINTF("\n\r x:%d", acc_X);
-	acc_Y = (int8_t) I2C_Master_Transmit(MMA_ADDR, REG_YHI);
-	wait_ms(100);
-	PRINTF("    y:%d", acc_Y);
-	acc_Z = (int8_t) I2C_Master_Transmit(MMA_ADDR, REG_ZHI);
-	wait_ms(100);
-	PRINTF("    z:%d", acc_Z);
-}*/
-
-//void convert_xyz_to_roll_pitch(void) {
-//	float ax = acc_X/COUNTS_PER_G,
-//				ay = acc_Y/COUNTS_PER_G,
-//				az = acc_Z/COUNTS_PER_G;
-//
-//	roll = atan2(ay, az)*180/M_PI;
-//	pitch = atan2(ax, sqrt(ay*ay + az*az))*180/M_PI;
-//
-//}

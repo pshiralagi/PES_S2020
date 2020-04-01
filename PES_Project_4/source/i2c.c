@@ -1,19 +1,24 @@
 /*********************************************************
  *
- * https://github.com/alexander-g-dean/ESF/blob/master/Code/Chapter_8/I2C-Demo/src/i2c.c
+ * @filename	i2c.c
+ * @brief		File containing i2c functions
+ * @author		aprakash, pshiralagi
+ * @reference	https://github.com/alexander-g-dean/ESF/blob/master/Code/Chapter_8/I2C-Demo/src/i2c.c
  *
  *********************************************************/
 
 
 
-#include <MKL25Z4.H>
+
 #include "i2c.h"
-#include "acc.h"
 
-int lock_detect=0;
-int i2c_lock=0;
 
-//init i2c0
+uint8_t lock_detect=0;
+uint8_t i2c_lock=0;
+
+/*
+ * @brief	Function to initialize i2c0
+ */
 void i2c_init(void)
 {
 	//clock i2c peripheral and port E
@@ -34,17 +39,14 @@ void i2c_init(void)
 	I2C0->C1 |= (I2C_C1_IICEN_MASK);
 
 
-	/***Added Myself***/
-	//enable acknowledge
-	//I2C0->C1 |= I2C_C1_TXAK_MASK;
-
-
-
 	// Select high drive mode
 	I2C0->C2 |= (I2C_C2_HDRS_MASK);
+
 }
 
-
+/*
+ * @brief Function to enter if i2c is busy
+ */
 void i2c_busy(void){
 	// Start Signal
 	lock_detect=0;
@@ -89,7 +91,9 @@ void i2c_busy(void){
 	i2c_lock=1;
 }
 
-
+/*
+ * @brief	Function to wait for i2c to complete
+ */
 void i2c_wait(void) {
 	lock_detect = 0;
 	while(((I2C0->S & I2C_S_IICIF_MASK)==0) & (lock_detect < 200)) {
@@ -100,14 +104,20 @@ void i2c_wait(void) {
 	I2C0->S |= I2C_S_IICIF_MASK;
 }
 
-//send start sequence
+/*
+ * @brief Start sequence
+ */
 void i2c_start()
 {
 	I2C_TRAN;							/*set to transmit mode */
 	I2C_M_START;					/*send start	*/
 }
 
-//send device and register addresses
+/*
+ * @brief	send device address, read address
+ * @param	dev is the device address
+ * @param	address is the read address
+ */
 
 void i2c_read_setup(uint8_t dev, uint8_t address)
 {
@@ -125,8 +135,9 @@ void i2c_read_setup(uint8_t dev, uint8_t address)
 
 }
 
-//read a byte and ack/nack as appropriate
-// #pragma no_inline
+/*
+ * @brief	To read data multiple times (multiple bytes)
+ */
 uint8_t i2c_repeated_read(uint8_t isLastRead)
 {
 	uint8_t data;
@@ -151,10 +162,9 @@ uint8_t i2c_repeated_read(uint8_t isLastRead)
 }
 
 
-
-//////////funcs for reading and writing a single byte
-//using 7bit addressing reads a byte from dev:address
-// #pragma no_inline
+/*
+ * @brief 	Function to read a single byte
+ */
 uint8_t i2c_read_byte(uint8_t dev, uint8_t address)
 {
 	uint8_t data;
@@ -185,7 +195,9 @@ uint8_t i2c_read_byte(uint8_t dev, uint8_t address)
 
 
 
-//using 7bit addressing writes a byte data to dev:address
+/*
+ * @brief	Function to write a single byte
+ */
 
 void i2c_write_byte(uint8_t dev, uint8_t address, uint8_t data)
 {
@@ -203,10 +215,14 @@ void i2c_write_byte(uint8_t dev, uint8_t address, uint8_t data)
 	I2C_M_STOP;
 
 }
+
+/*
+ * @brief	Function to start interrupt i2c transmit
+ */
 void I2C_Master_Transmit(void)
 {
 	I2C0->C1 |= I2C_C1_MST_MASK;		//  Generate START SIGNAL
-	I2C0->D = ((0x3A << 1) | 0x01);		// Write 7-bit Slave Address + READ bit*/
+	I2C0->D = ((0x3A << 1) | 0x2A);		// Write 7-bit Slave Address + READ bit*/
 
 	__disable_irq();
 		//set interrupt
@@ -220,7 +236,9 @@ void I2C_Master_Transmit(void)
 }
 
 
-
+/*
+ * @brief	I2C0 interrupt handler
+ */
 
 void I2C0_IRQHandler(void)
 {
@@ -234,6 +252,8 @@ void I2C0_IRQHandler(void)
 		if(ACK)
 		{
 			read_full_xyz();
+			//set interrupt
+			I2C0->C1 &= ~(I2C_C1_IICIE_MASK);
 			I2C_TRAN;
 //			I2C_Master_Transmit();
 		}

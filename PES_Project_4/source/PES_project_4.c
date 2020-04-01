@@ -1,45 +1,35 @@
 /**
  * @file    PES_Project_4.c
- * @brief   Application entry point.
- *
- *
- *	Things to do -
- *
- *	Antara :
- *	1. Add i2c_polling function in fsm_1 (create i2c.c and i2c.h files) - On board
- *	2. Add i2c interrupt function in fsm_2
- *	3. Add POST_test
- *	4. Add LED control (blue LED on in POST_test, green in normal states, red if LIS 331 is disconnected)
- *	5. Read accelerometer using SPI in fsm_3 (create spi.c and spi.h files) - Loopback
- *	6. Logger Extensions (create logger.c and logger.h files) (apparently you need to build on work done for project 3)
- *	7. Add CUnittests (in test mode)
- *	8. Add debug messages using logger (debug mode)
- *	9. Add those defines in general.h
- *	10. Check if the systick irq initialization stuff makes sense
- *
- *	Moi :
- *	10. Take and annotate scope measurements for i2c
- *	11. Create Readme
- *	12. Comment code
- *
- *
- *
- *
+ * @brief   Application entry point for Project 4, using i2c and SPI in state machines
+ * @author	pshiralagi, aprakash
+ * @date	04/01/2020
+ * @references:	https://stackoverflow.com/questions/252748/how-can-i-use-an-array-of-function-pointers
  *
  *
  */
 #include "general.h"
 bool state_machine_1, state_machine_2, state_machine_3;
-
+uint8_t POST_test(void);
+/*
+ * Code Entry
+ */
 int main(void)
 {
+	/*	Board Initialization	*/
 	board_init();
+	/*	Blue LED On	*/
 	Start_Test();
+	/*	Initialize i2c	*/
 	i2c_init();
-	init_mma();
+	/*	Initialize SPI	*/
 	Init_SPI1();
-	//	POST_test();
-	//If POST test fails, call program end function
+	/*	Initialize on board Accelerometer	*/
+	acc_init();
+
+	/*	POST, checks SPI	*/
+	if(!(POST_test()))
+		state_machine_1 = 0;//If POST fails
+
 	while(state_machine_1 | state_machine_2 | state_machine_3)
 	{
 		fsm_1();
@@ -48,6 +38,21 @@ int main(void)
 	}
 
 	/*	If program runs correctly, it will only go hear when program ends	*/
+	Fail_Test();//Red LED
 	while(1);
 
+}
+
+
+/*
+ * @brief : Power On Self Test verifies that the SPI loop is complete
+ */
+uint8_t POST_test(void)
+{
+
+	if(Test_SPI_Loopback()==1)
+	{
+		return 1;
+	}
+	return 0;
 }

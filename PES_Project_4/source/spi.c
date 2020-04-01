@@ -1,37 +1,18 @@
 /*
- * spi.c
+ * @filename	 spi.c
  *
- *  Created on: Mar 20, 2020
- *      Author: praka
+ *  @date: Mar 20, 2020
+ *      @author: aprakash, pshiralagi
+ *      @reference	parts of code taken from the in class coding exercise
  */
 
-
-/*
- * SPI.c
- *
- *  Created on: Mar 18, 2020
- *      Author: praka
- */
 #include "spi.h"
 
+/*
+ * @brief	Function to initialize SPI
+ */
 void Init_SPI1(void) {
-	/*SIM->SCGC4 |= SIM_SCGC4_SPI0_MASK;// SIM_SCGC4_xxxx_MASK; // enable clock to SPI1
-	SIM->SCGC5 |= SIM_SCGC5_PORTE_MASK;
-	SPI1->C1 &= ~SPI_C1_SPE_MASK; // disable SPI1 to allow configuration
-	PORTE->PCR[2] &= ~PORT_PCR_MUX_MASK; // set SPI1_SCK -- ALT2
-	PORTE->PCR[2] |= PORT_PCR_MUX(2);
-	PORTE->PCR[3] &= ~PORT_PCR_MUX_MASK; // set SPI1_MOSI -- ALT5
-	PORTE->PCR[3] |= PORT_PCR_MUX(5);
-	PORTE->PCR[1] &= ~PORT_PCR_MUX_MASK; // set SPI1_MISO -- ALT5
-	PORTE->PCR[1] |= PORT_PCR_MUX(5);
-	PORTE->PCR[4] &= ~PORT_PCR_MUX_MASK; // set SPI1_PCS0 -- ALT2
-	PORTE->PCR[4] |= PORT_PCR_MUX(2);
-	SPI1->C1 = SPI_C1_MSTR_MASK | SPI_C1_SSOE_MASK; // Select master mode, enable SS output
-	SPI1->C2 = SPI_C2_MODFEN_MASK;
-	SPI1->C1 &= ~SPI_C1_CPHA_MASK; // Select active high clock, first edge sample
-	SPI1->C1 &= ~SPI_C1_CPOL_MASK;
-	SPI1->BR = SPI_BR_SPPR(1) | SPI_BR_SPR(3); // BaudRate = BusClock / ((zzzz+1)*2^(www+1))
-	SPI1->C1 |= SPI_C1_SPE_MASK; // enable SPI1*/
+
 	// enable clock to SPI1
 		SIM->SCGC4 |= SIM_SCGC4_SPI1_MASK;
 		SIM->SCGC5 |= SIM_SCGC5_PORTE_MASK;
@@ -68,6 +49,10 @@ void Init_SPI1(void) {
 		// enable SPI1
 		SPI1->C1 |= SPI_C1_SPE_MASK;
 }
+
+/*
+ * @brief	Test SPI send
+ */
 uint8_t test_SPIsend(uint8_t d_out)
 {
 	while(!(SPI1->S & SPI_S_SPTEF_MASK))
@@ -78,6 +63,10 @@ uint8_t test_SPIsend(uint8_t d_out)
 		; // wait for receive buffer full
 	return SPI1->D;
 }
+
+/*
+ * @brief	SPI Loopback function
+ */
 uint8_t Test_SPI_Loopback(void) {
 	uint8_t out='A', in, output;
 	in = test_SPIsend(out);

@@ -1,8 +1,8 @@
 /*
- * spi.h
+ * @file spi.h
  *
- *  Created on: Mar 20, 2020
- *      Author: praka
+ *  @date: Mar 20, 2020
+ *      @author: aprakash, pshiralagi
  */
 
 #ifndef SPI_H_

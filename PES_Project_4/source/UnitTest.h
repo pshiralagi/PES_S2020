@@ -10,7 +10,7 @@
 
 #include "general.h"
 #include <stdint.h>
-#include <stdlib.h>
+#include <stdlib.h>initializes mma8451 sensorinitializes mma8451 sensor
 
 void unit_test(void);
 
