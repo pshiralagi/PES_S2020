@@ -13,6 +13,9 @@ This repository contains C code for project 4 as described in Assignment 4 of th
 3. The POST checks for SPI connection (on board accelerometer cannot be disconnected)
 4. 3 State Machines are present but state machine 3 just checks for SPI loopback and then makes a decision on the next state as 
 described in the Assignment 4
+5. We were unable to take scope shots of the i2c transactions as the pins are not accesible.  I have taken
+a picture of the oscilloscope sending out an A (01000001). Please see the [A_SPI.jpg file](./doc/A_SPI.jpg)
+I do not have any memory device I can connect to the oscilloscope at home. Please forgive the low image quality.
 
 - fsm1 is the state driven state machine that uses a polling i2c method to obtain accelerometer values
 - fsm2 is a table driven state machine that uses interrupt driven i2c
