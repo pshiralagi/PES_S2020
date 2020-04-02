@@ -194,7 +194,7 @@
 /* Variables */
 /*****************************************************************************/
 
-/* Variables for simple statistics */
+///* Variables for simple statistics */
 static int ucunit_checks_failed = 0; /* Number of failed checks */
 static int ucunit_checks_passed = 0; /* Number of passed checks */
 

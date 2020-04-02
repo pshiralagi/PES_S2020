@@ -18,21 +18,23 @@ static uint16_t x_avg = 0, x_max = 0, x_min = 0, x_curr = 0;
 static uint16_t y_avg = 0, y_max = 0, y_min = 0, y_curr = 0;
 static uint16_t z_avg = 0, z_max = 0, z_min = 0, z_curr = 0;
 static uint8_t state_count = 0;
-static uint16_t spi_loop = 0;
 static uint32_t sum_x = 0, sum_y = 0, sum_z = 0;
 
 /* @brief : State driven state machine is used for fsm_1 with a polling method of reading I2C values	*/
 void fsm_1(void)
 {
+	Success_Test();
 	current_state = readAccelerometer;
 	while(state_machine_1)
 	{
-	Success_Test();
+
 
 #ifdef DEBUG_MODE
-		log_func_Str(DebugMode, fsm1_, "Green LED is on");
+		log_func_Str(DebugMode, fsm1_, "State Machine 1");
 #endif
-
+#ifdef TEST_MODE
+		log_func_Str(Test, fsm1_, "State Machine 1");
+#endif
 		switch(current_state)
 		{
 			case readAccelerometer:
@@ -83,13 +85,21 @@ void fsm_1(void)
 void (*fsm_2_ptr_arr[5])() = {i2c_interrupt_accelerometer, sort_data, display_data, state_decision, program_end};
 void fsm_2(void)
 {
+	Success_Test();
+
+	if(state_machine_2)
+	{
 #ifdef DEBUG_MODE
-	log_func_Str(DebugMode, fsm2, "Green LED is on");
+	log_func_Str(DebugMode, fsm2, "State machine 2");
 #endif
+#ifdef TEST_MODE
+	log_func_Str(Test, fsm2, "State machine 2");
+#endif
+	}
+
 	current_state = 0;
 	while(state_machine_2)
 	{
-		Success_Test();
 
 		(*fsm_2_ptr_arr[current_state])();
 		current_state++;
@@ -106,22 +116,25 @@ void fsm_2(void)
 void (*fsm_3_ptr_arr[2])() = {spi_count, state_decision};
 void fsm_3(void)
 {
-
+	Success_Test();
 	////SPI only
 	current_state = 0;
+	if(state_machine_3)
+	{
 #ifdef DEBUG_MODE
-	log_func_Str(DebugMode, fsm3, "Green LED is on");
+		log_func_Str(DebugMode, fsm3, "State Machine 3");
 #endif
+#ifdef TEST_MODE
+		log_func_Str(Test, fsm3, "State Machine 3");
+#endif
+	}
 
 	while(state_machine_3)
 	{
-		Success_Test();
 
 
 		(*fsm_3_ptr_arr[current_state])();
 		current_state++;
-		/*	If sensor is is disconnected in i2c_interrupt_read	*/
-//		current_sate = 4;
 	}
 
 
@@ -134,11 +147,21 @@ void fsm_3(void)
 void spi_count(void){
 	if(Test_SPI_Loopback()){
 		Success_Test();
-		log_func_Str(DebugMode, spicount, "Green LED is on");
-		spi_loop++;
+	#ifdef DEBUG_MODE
+		log_func_Str(DebugMode, spicount, "Data Received on loopback");
+	#endif
+	#ifdef TEST_MODE
+		log_func_Str(Test, spicount, "Data Received on loopback");
+	#endif
+
 	}else{
 		Fail_Test();
-		log_func_Str(DebugMode, spicount, "RED LED is on");
+	#ifdef DEBUG_MODE
+		log_func_Str(DebugMode, spicount, "Data not Received on loopback");
+	#endif
+	#ifdef TEST_MODE
+		log_func_Str(Test, spicount, "Data not Received on loopback");
+	#endif
 	}
 }
 
@@ -158,7 +181,10 @@ void i2c_interrupt_accelerometer(){
 void state_decision(void)
 {
 	#ifdef DEBUG_MODE
-		log_func_Str(DebugMode, statedecision, "Green LED is on");
+		log_func_Str(DebugMode, statedecision, "Deciding State number");
+	#endif
+	#ifdef TEST_MODE
+		log_func_Str(Test, statedecision, "Deciding State number");
 	#endif
 	if(state_machine_1 | state_machine_2)
 		state_count++;
@@ -166,18 +192,14 @@ void state_decision(void)
 	SysTick_delay(3);
 	while (interrupt_clear == false)
 	{
-
 		cap_val = touch_scan();	//Obtaining capacitance slider value
+		wait_ms(50);
 
-	#ifdef DEBUG_MODE
-		log_func_Str(DebugMode, statedecision, "Green LED is on");
-		Log_Integer(cap_val);
-	#endif
 
 	}
 	interrupt_clear = false;
 
-	if ((state_count == 6) | (cap_val < 5001) | (cap_val > 500))
+	if ((state_count == 6) | ((cap_val < 5001) & (cap_val > 500)))
 	{
 		if(state_count == 6)
 		{
@@ -188,21 +210,21 @@ void state_decision(void)
 		}
 		if (state_machine_1)
 		{
-			PRINTF("\n\r state machine 2");
+
 			state_machine_1 = 0;
 			state_machine_2 = 1;
 			state_machine_3 = 0;
 		}
 		else if (state_machine_2)
 		{
-			PRINTF("\n\r state machine 3");
+
 			state_machine_1 = 0;
 			state_machine_2 = 0;
 			state_machine_3 = 1;
 		}
 		else if (state_machine_3)
 		{
-			PRINTF("\n\r state machine 1");
+
 			state_machine_1 = 1;
 			state_machine_2 = 0;
 			state_machine_3 = 0;
@@ -213,7 +235,13 @@ void state_decision(void)
 	{
 		current_state = readAccelerometer;
 	}
-	if(cap_val > 14500)
+	else if(state_machine_3)
+	{
+		state_machine_1 = 1;
+		state_machine_2 = 0;
+		state_machine_3 = 0;
+	}
+	if(cap_val > 10500)
 	{
 		program_end();
 
@@ -226,7 +254,10 @@ void state_decision(void)
 void display_data(void)
 {
 	#ifdef DEBUG_MODE
-	log_func_Str(DebugMode, displaydata, "Green LED is on");
+		log_func_Str(DebugMode, displaydata, "Following Data");
+	#endif
+	#ifdef TEST_MODE
+		log_func_Str(Test, displaydata, "Following Data");
 	#endif
 
 	printf("\n\rState Count = %d", state_count);
@@ -242,7 +273,10 @@ void display_data(void)
 void sort_data(void)
 {
 	#ifdef DEBUG_MODE
-	log_func_Str(DebugMode, sortdata, "Green LED is on");
+	log_func_Str(DebugMode, sortdata, "Data sorting");
+	#endif
+	#ifdef TEST_MODE
+	log_func_Str(Test, sortdata, "Data sorting");
 	#endif
 	x_curr = acc_X;
 	y_curr = acc_Y;
@@ -310,8 +344,15 @@ void program_end(void)
 	state_machine_1 = 0;
 	state_machine_2 = 0;
 	state_machine_3 = 0;
+#ifdef STATUS
+		log_func_Str(Status, statusmode , "");
+		Log_string("Program Ended");
+	#endif
 #ifdef DEBUG_MODE
-	log_func_Str(DebugMode, programend, "LED is off");
+	log_func_Str(DebugMode, programend, "End of State machine");
+#endif
+#ifdef TEST_MODE
+	log_func_Str(Test, programend, "End of State machine");
 #endif
 }
 

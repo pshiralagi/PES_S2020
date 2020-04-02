@@ -7,11 +7,6 @@
  *    	@author : Pavan Shiralagi and Antara Prakash
  */
 
-/** DO NOT USE WITH CUSTOM MAKEFILE **/
-//#define FB_RUN 1	//Non - debug program run natively on the board
-//#define FB_DEBUG 1	//Debug version of FB_RUN, includes print statements
-//#define PC_RUN 1	//Not run on the board, run on the PC where statements are printed to the debug console
-//#define PC_DEBUG 1	//Debug version of PC_RUN with a lot more debug statements
 /*****************************************************************************/
 
 #ifndef general_h_
@@ -20,12 +15,11 @@
 #include <stdio.h>
 
 //#define TEST_MODE
-//#define DEBUG_MODE
-#define STATUS
+#define DEBUG_MODE
+//#define STATUS
 
 #ifdef TEST_MODE
-#define DEBUG_MODE
-#include "uCUnit.h"
+#include "UnitTest.h"
 #endif
 
 
@@ -45,6 +39,7 @@
 #include "spi.h"
 #include "i2c.h"
 #include "acc.h"
+
 
 
 #endif

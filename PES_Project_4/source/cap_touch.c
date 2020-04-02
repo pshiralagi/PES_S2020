@@ -5,7 +5,7 @@
  *  @description : File containing functions related to capacitive touch
  *
  *		@reference : https://www.digikey.com/eewiki/display/microcontroller/Using+the+Capacitive+Touch+Sensor+on+the+FRDM-KL46Z#UsingtheCapacitiveTouchSensorontheFRDM-KL46Z
- *    	@author : pshiralagi
+ *    	@author : pshiralagi, aprakash
  *
  */
 

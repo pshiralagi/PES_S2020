@@ -12,6 +12,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "fsl_debug_console.h"
+#include "general.h"
 
 
 typedef enum {
@@ -39,7 +40,10 @@ typedef enum {
 	ready_,
 	readz_,
 	touchscan,
-	spicount
+	spicount,
+	TestSPILoopback,
+	statusmode,
+	POST
 }func_name;
 
 

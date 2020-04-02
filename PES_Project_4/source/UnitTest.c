@@ -15,6 +15,7 @@
  ***********************************************************************************/
 
 
+#include "UnitTest.h"
 
 
 
@@ -25,24 +26,28 @@
 #define ADDRESS 0x3A
 #define REG_CTRL1 0x2A
 #define REG_XHI 0x01
-#ifdef TEST_MODE
+
 void unit_test(void){
 
-		/*mem_status status;
-		struct data_type type;
-		type.offset = 9;
-		type.length = 2;
-		type.size = 16;
-		type.value = 0xFFEE;
-		type.seed = 143;*/
 		uint8_t status;
 		uint16_t data;
 		int i=0;
-		int j;
     	/************ Initialization *************/
 		UCUNIT_Init();	//initialize framework
-		i2c_init();	//
 
+		/****************I2C Init********************/
+		i2c_init();	//
+		log_func_Str(Test, initmma, "Initializing I2C");
+		UCUNIT_TestcaseBegin("Initializing I2C");
+		//UCUNIT_CheckIsEqual(i, 1);
+		UCUNIT_TestcaseEnd();
+
+		/*****************SPI INIT******************/
+		Init_SPI1();	//
+		log_func_Str(Test, initmma, "Initializing SPI");
+		UCUNIT_TestcaseBegin("Initializing SPI");
+		//UCUNIT_CheckIsEqual(i, 1);
+		UCUNIT_TestcaseEnd();
 
 		/********** I2C Read test **********/
 		status = i2c_read_byte(ADDRESS, REG_XHI);
@@ -55,10 +60,16 @@ void unit_test(void){
 		UCUNIT_TestcaseEnd();
 
 		/********** Accelerometer initialization **********/
-		status = init_mma();
+		init_mma();
 		log_func_Str(Test, initmma, "Initializing accelerometer");
 		UCUNIT_TestcaseBegin("Initializing accelerometer");
-		UCUNIT_CheckIsEqual(status, 1);
+		//UCUNIT_CheckIsEqual(i, 1);
+		UCUNIT_TestcaseEnd();
+
+		/************ Read full Xyz**********************/
+		read_full_xyz();
+		log_func_Str(Test, initmma, "READING XYZ");
+		UCUNIT_TestcaseBegin("READING XYZ");
 		UCUNIT_TestcaseEnd();
 
 		/************** Accelerometer Read X*************/
@@ -68,7 +79,7 @@ void unit_test(void){
 		if(data >= 0){
 			i = 1;
 		}
-		UCUNIT_CheckIsEqual(data, 1);
+		UCUNIT_CheckIsEqual(i, 1);
 		UCUNIT_TestcaseEnd();
 
 		/************** Accelerometer Read Y*************/
@@ -78,7 +89,7 @@ void unit_test(void){
 		if(data >= 0){
 			i = 1;
 		}
-		UCUNIT_CheckIsEqual(data, 1);
+		UCUNIT_CheckIsEqual(i, 1);
 		UCUNIT_TestcaseEnd();
 
 		/************** Accelerometer Read Z*************/
@@ -88,7 +99,7 @@ void unit_test(void){
 		if(data >= 0){
 			i = 1;
 		}
-		UCUNIT_CheckIsEqual(data, 1);
+		UCUNIT_CheckIsEqual(i, 1);
 		UCUNIT_TestcaseEnd();
 
 		/*********** Touch Screen Test ************/
@@ -98,11 +109,25 @@ void unit_test(void){
     	if(data >= 0){
     		i = 1;
     	}
-    	UCUNIT_CheckIsEqual(data, 1);
+    	UCUNIT_CheckIsEqual(i, 1);
     	UCUNIT_TestcaseEnd();
+    	/***************SPI Loopback*******************/
+
+    	status = Test_SPI_Loopback();
+    	UCUNIT_TestcaseBegin("SPI Loopback");
+    	log_func_Str(Test, TestSPILoopback, "reading data through SPI");
+    	UCUNIT_CheckIsEqual(status, 1);
+    	UCUNIT_TestcaseEnd();
+
+    	/************************************************/
+
 
 		/*** Test Shutdown ****/
 		UCUNIT_WriteSummary();
+		if(ucunit_testcases_failed == 0)
+			Success_Test();
+		else
+			Fail_Test();
 		UCUNIT_Shutdown();
 	}
-#endif
+

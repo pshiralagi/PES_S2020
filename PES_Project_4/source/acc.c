@@ -24,8 +24,8 @@ extern uint32_t DATA_READY;
 void acc_init(void)
 {
 	init_mma();
+	I2C_Master_Transmit();
 	read_full_xyz();
-	i2c_interrupt_accelerometer();
 
 }
 
@@ -86,7 +86,7 @@ void read_full_xyz()
 	int i;
 	uint8_t data[6];
 	int16_t temp[3];
-	init_mma();
+	//init_mma();
 	i2c_start();
 	i2c_read_setup(MMA_ADDR , REG_XHI);
 
@@ -103,22 +103,8 @@ void read_full_xyz()
 
 	// Align for 14 bits
 	acc_X = temp[0]/4;
-	#ifdef DEBUG_MODE
-		log_func_Str(DebugMode, readfullxyz, "Green LED is on");
-		Log_Integer(acc_X);
-	#endif
-
-		acc_Y = temp[1]/4;
-	#ifdef DEBUG_MODE
-		log_func_Str(DebugMode, readfullxyz, "Green LED is on");
-		Log_Integer(acc_Y);
-	#endif
-
-		acc_Z = temp[2]/4;
-	#ifdef DEBUG_MODE
-		log_func_Str(DebugMode, readfullxyz, "Green LED is on");
-		Log_Integer(acc_Z);
-	#endif
+	acc_Y = temp[1]/4;
+	acc_Z = temp[2]/4;
 }
 
 void read_xyz(void)

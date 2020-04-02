@@ -25,6 +25,12 @@ int main(void)
 	Init_SPI1();
 	/*	Initialize on board Accelerometer	*/
 	acc_init();
+	#ifdef STATUS
+		log_func_Str(Status, statusmode , "");
+	#endif
+	#ifdef TEST_MODE
+		unit_test();
+	#endif
 
 	/*	POST, checks SPI	*/
 	if(!(POST_test()))
@@ -49,9 +55,11 @@ int main(void)
  */
 uint8_t POST_test(void)
 {
-
 	if(Test_SPI_Loopback()==1)
 	{
+#ifdef DEBUG_MODE
+		log_func_Str(DebugMode, POST, "Test Passed");
+#endif
 		return 1;
 	}
 	return 0;

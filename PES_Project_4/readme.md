@@ -14,7 +14,9 @@ This repository contains C code for project 4 as described in Assignment 4 of th
 4. 3 State Machines are present but state machine 3 just checks for SPI loopback and then makes a decision on the next state as 
 described in the Assignment 4
 5. We were unable to take scope shots of the i2c transactions as the pins are not accesible.  I have taken
-a picture of the oscilloscope sending out an A (01000001). Please see the [A_SPI.jpg file](./doc/A_SPI.jpg)
+a picture of the oscilloscope sending out an A (01000001). 
+Please see the [A_SPI.jpg file](./doc/A_SPI.jpg)
+
 I do not have any memory device I can connect to the oscilloscope at home. Please forgive the low image quality.
 
 - fsm1 is the state driven state machine that uses a polling i2c method to obtain accelerometer values
@@ -24,7 +26,8 @@ I do not have any memory device I can connect to the oscilloscope at home. Pleas
 The three modes it can be run in are - 
 ### STATUS - Minimal prints/logging to show working of state machines, i2c (interrupt and polling) and spi
 ### DEBUG_MODE - Increased logging to help debug or better understand code flow
-### TEST_MODE - Same logging as DEBUG_MODE with the inclusion of C Unit Tests
+### TEST_MODE - Runs the C Unit Tests, displays detailed results, changes LED to green if all pass and red if any fail
+ and then ends in an infinite loop
 The mode can be selected in 'general.h' 
 Please see the [general.h file](./source/general.h) for further details.
 
@@ -60,7 +63,8 @@ Each source file has its own header file.
 
 - Some problems creating table driven state machine. The length of array of pointers is required to be declared explicitly.
 	This could be because the memory defined gets formatted differently. 
-- Capactive touch values are very unreliable.
+- Capactive touch values are unreliable.
+- Zero values from accelerometer occasionally
 
 ## Execution Notes
 
