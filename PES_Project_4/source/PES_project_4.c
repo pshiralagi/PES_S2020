@@ -4,6 +4,8 @@
  * @author	pshiralagi, aprakash
  * @date	04/01/2020
  * @references:	https://stackoverflow.com/questions/252748/how-can-i-use-an-array-of-function-pointers
+ * https://community.nxp.com/thread/319111
+ * https://github.com/alexander-g-dean/ESF/tree/master/Code/Chapter_8/I2C-Demo
  *
  *
  */
