@@ -1,3 +1,10 @@
+/*
+ * @file uart.h
+ *
+ *  @date: Apr 7, 2020
+ *      @author: pshiralagi, aprakash
+ */
+
 #ifndef UART_H
 #define UART_H
 

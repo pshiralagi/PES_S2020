@@ -3,9 +3,10 @@
  * @brief   Application entry point for Project 5, using UART and circular buffers
  * @author	pshiralagi, aprakash
  * @date	04/01/2020
- * @references:	https://stackoverflow.com/questions/252748/how-can-i-use-an-array-of-function-pointers
- * https://community.nxp.com/thread/319111
- * https://github.com/alexander-g-dean/ESF/tree/master/Code/Chapter_8/I2C-Demo
+ * @references:	https://github.com/peterfillmore/frdm-kl25z-exploit-practice-code/blob/master/uart.c
+ * https://github.com/manuelnaranjo/bare-metal-arm-frdm-kl25z/blob/master/common.h
+ * http://www.simplyembedded.org/tutorials/interrupt-free-ring-buffer/
+ * https://github.com/alexander-g-dean/ESF/tree/master/Code
  *
  *
  */
@@ -39,14 +40,11 @@ int main(void)
 	#if USE_UART_INTERRUPTS==0// Polling version of code
 		Send_String_Poll("\n\rHello, World!\n\r");
 
-		// Code listing 8.9, p. 233
 		while (1) {
 			uart_echo_blocking();
 		}
 	#elif USE_UART_INTERRUPTS==1 // Interrupt version of code
 		Send_String("\n\rHello, World!\n\r");
-
-		// Code listing 8.10, p. 234
 		while (1) {
 			uart_echo();
 		}

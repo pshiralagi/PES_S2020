@@ -1,3 +1,13 @@
+/*
+ * @file	buffer.c
+ * @author	pshiralagi and aprakash
+ * @date	7th April
+ * @reference	http://www.simplyembedded.org/tutorials/interrupt-free-ring-buffer/
+ * https://hackaday.com/2015/10/29/embed-with-elliot-going-round-with-circular-buffers/
+ */
+
+
+
 #include "buffer.h"
 
 buffer_status isBufferInitialized(buffer_t *q)

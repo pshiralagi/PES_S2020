@@ -1,16 +1,20 @@
+/*
+ * @file uart.c
+ *
+ *  @date: Apr 7, 2020
+ *  @reference
+ *  	Code created by Shannon Strutz
+ *  	Licensed under CC BY-NC-SA 3.0
+ *  	http://creativecommons.org/licenses/by-nc-sa/3.0/
+ *
+ *      @author: pshiralagi, aprakash
+ */
+
 #include "UART.h"
 
 buffer_t * Tx;
 buffer_t * Rx;
-/* BEGIN - UART0 Device Driver
-	Code created by Shannon Strutz
-	Date : 5/7/2014
-	Licensed under CC BY-NC-SA 3.0
-	http://creativecommons.org/licenses/by-nc-sa/3.0/
-	Modified by Alex Dean 9/13/2016
 
-	Modified by Pshiralagi and Aprakash 04/06/2020
-*/
 struct __FILE
 {
   int handle;
@@ -97,14 +101,6 @@ void Init_UART0(uint32_t baud_rate) {
 	UART0->S1 &= ~UART0_S1_RDRF_MASK;
 
 }
-
-/* END - UART0 Device Driver
-	Code created by Shannon Strutz
-	Date : 5/7/2014
-	Licensed under CC BY-NC-SA 3.0
-	http://creativecommons.org/licenses/by-nc-sa/3.0/
-	Modified by Alex Dean 9/13/2016
-*/
 
 
 uint8_t tx_ready(void)
@@ -243,5 +239,3 @@ uint8_t	* Get_Rx_Char(void) {
 	return rec;
 }
 
-
-// *******************************ARM University Program Copyright © ARM Ltd 2013*************************************
