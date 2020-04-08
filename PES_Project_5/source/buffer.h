@@ -3,24 +3,32 @@
 
 #include "general.h"
 
-#define Q_MAX_SIZE (256)
-
 typedef struct {
-  unsigned int Head; // Index of oldest data element
-  unsigned int Tail; // Index of next free space
-  unsigned int Size; // Number of elements in use
-  uint8_t Data[Q_MAX_SIZE];
-}  Q_T;
+	uint8_t *buffer;	//pointer to the buffer
+	uint8_t *head;		//Where to add an item
+	uint8_t *tail;	//Where to remove an item
+	size_t  size;		//No. of items allocated to the buffer
+	size_t count;	//number of items currently in the buffer
+	}buffer_t;
 
 
-extern int Q_Empty(Q_T * q);
-extern int Q_Full(Q_T * q);
-extern int Q_Size(Q_T * q);
-extern int Q_Enqueue(Q_T * q, uint8_t d);
-extern uint8_t Q_Dequeue(Q_T * q);
-extern void Q_Init(Q_T * q);
+typedef enum {
+	success,
+	buff_full,
+	buff_empty,
+	fail
+	}buffer_status;
 
 
-extern Q_T TxQ, RxQ;
+buffer_status bufferAdd(buffer_t *q, 	uint8_t data);
+buffer_status bufferRemove(buffer_t *q, uint8_t *data);
+buffer_status isBufferFull(buffer_t *q);
+buffer_status isBufferEmpty(buffer_t *q);
+buffer_status init_buffer(buffer_t *q, size_t size);
+buffer_status destroy_buffer(buffer_t *q);
+buffer_status isPointerValid(buffer_t *q);
+buffer_status isBufferInitialized(buffer_t*q);
 
+extern buffer_t * Tx;
+extern buffer_t * Rx;
 #endif // BUFFER_H

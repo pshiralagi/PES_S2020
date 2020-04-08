@@ -1,7 +1,7 @@
 #include "UART.h"
-Q_T TxQ, RxQ;
 
-
+buffer_t * Tx;
+buffer_t * Rx;
 /* BEGIN - UART0 Device Driver
 	Code created by Shannon Strutz
 	Date : 5/7/2014
@@ -80,9 +80,6 @@ void Init_UART0(uint32_t baud_rate) {
 	UART0->S2 = UART0_S2_MSBF(0) | UART0_S2_RXINV(0);
 
 #if USE_UART_INTERRUPTS
-	// Enable interrupts. Listing 8.11 on p. 234
-	Q_Init(&TxQ);
-	Q_Init(&RxQ);
 
 	NVIC_SetPriority(UART0_IRQn, 2); // 0, 1, 2, or 3
 	NVIC_ClearPendingIRQ(UART0_IRQn);
@@ -109,22 +106,80 @@ void Init_UART0(uint32_t baud_rate) {
 	Modified by Alex Dean 9/13/2016
 */
 
-// Code listing 8.9, p. 233
-void UART0_Transmit_Poll(uint8_t data) {
-		while (!(UART0->S1 & UART0_S1_TDRE_MASK))
-			;
-		UART0->D = data;
+
+uint8_t tx_ready(void)
+{
+	if (UART0->S1 & UART0_S1_TDRE_MASK)
+		return 1;
+	return 0;
 }
 
-uint8_t UART0_Receive_Poll(void) {
-		while (!(UART0->S1 & UART0_S1_RDRF_MASK))
+void tx_data(uint8_t data)
+{
+	UART0->D = data;
+}
+// Code listing 8.9, p. 233
+void UART0_Transmit_Poll(uint8_t data) {
+		while (!(tx_ready()))
 			;
-		return UART0->D;
+		tx_data(data);
+
+}
+
+uint8_t rx_ready(void)
+{
+	if (UART0->S1 & UART0_S1_RDRF_MASK)
+		return 1;
+	return 0;
+}
+
+uint8_t rx_data (void)
+{
+	return UART0->D;
+}
+uint8_t UART0_Receive_Poll(void) {
+		while (!(rx_ready()))
+			;
+		return rx_data();
+}
+
+void uart_echo_blocking(void)
+{
+	uint8_t c;
+	c = UART0_Receive_Poll();
+	UART0_Transmit_Poll(c);
+}
+
+void uart_echo(void)
+{
+	uint8_t buffer[80], *c = 0, * bp;
+	// Blocking receive
+	while (isBufferEmpty(Rx) == buff_empty)
+		; // wait for character to arrive
+	bufferRemove(Rx, &c);
+
+	// Blocking transmit
+	sprintf((char *) buffer, "You pressed %c\n\r", c);
+	// enqueue string
+	bp = buffer;
+	while (*bp != '\0') {
+		// copy characters up to null terminator
+		while (isBufferFull(Tx) == buff_full)
+			; // wait for space to open up
+		bufferAdd(Tx, *bp);
+		bp++;
+	}
+	// start transmitter if it isn't already running
+	if (!(UART0->C2 & UART0_C2_TIE_MASK)) {
+		bufferRemove(Tx, &c);
+		UART0->D = c;
+		UART0->C2 |= UART0_C2_TIE(1);
+	}
 }
 
 // UART0 IRQ Handler. Listing 8.12 on p. 235
 void UART0_IRQHandler(void) {
-	uint8_t ch;
+	uint8_t ch, *c;
 
 	if (UART0->S1 & (UART_S1_OR_MASK |UART_S1_NF_MASK |
 		UART_S1_FE_MASK | UART_S1_PF_MASK)) {
@@ -137,8 +192,8 @@ void UART0_IRQHandler(void) {
 	if (UART0->S1 & UART0_S1_RDRF_MASK) {
 		// received a character
 		ch = UART0->D;
-		if (!Q_Full(&RxQ)) {
-			Q_Enqueue(&RxQ, ch);
+		if (isBufferFull(Rx) != buff_full) {
+			bufferAdd(Rx, ch);
 		} else {
 			// error - queue full.
 			// discard character
@@ -147,8 +202,9 @@ void UART0_IRQHandler(void) {
 	if ( (UART0->C2 & UART0_C2_TIE_MASK) && // transmitter interrupt enabled
 			(UART0->S1 & UART0_S1_TDRE_MASK) ) { // tx buffer empty
 		// can send another character
-		if (!Q_Empty(&TxQ)) {
-			UART0->D = Q_Dequeue(&TxQ);
+		if (isBufferEmpty(Tx)!=buff_empty) {
+			bufferRemove(Tx, &c);
+			UART0->D = c;
 		} else {
 			// queue is empty so disable transmitter interrupt
 			UART0->C2 &= ~UART0_C2_TIE_MASK;
@@ -164,27 +220,27 @@ void Send_String_Poll(uint8_t * str) {
 }
 
 void Send_String(uint8_t * str) {
+	uint8_t *recv = 0;
 	// enqueue string
 	while (*str != '\0') { // copy characters up to null terminator
-		while (Q_Full(&TxQ))
+		while (isBufferFull(Tx) == buff_full)
 			; // wait for space to open up
-		Q_Enqueue(&TxQ, *str);
+		bufferAdd(Tx, *str);
 		str++;
 	}
 	// start transmitter if it isn't already running
 	if (!(UART0->C2 & UART0_C2_TIE_MASK)) {
-		UART0->D = Q_Dequeue(&TxQ);
+		bufferRemove(Tx, &recv);
+		UART0->D = recv;
 		UART0->C2 |= UART0_C2_TIE(1);
 	}
 }
 
 
-uint32_t Rx_Chars_Available(void) {
-	return Q_Size(&RxQ);
-}
-
-uint8_t	Get_Rx_Char(void) {
-	return Q_Dequeue(&RxQ);
+uint8_t	* Get_Rx_Char(void) {
+	uint8_t *rec = 0;
+	bufferRemove(Tx, rec);
+	return rec;
 }
 
 

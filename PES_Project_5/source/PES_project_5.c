@@ -12,6 +12,7 @@
 #include "general.h"
 bool state_machine_1, state_machine_2, state_machine_3;
 uint8_t POST_test(void);
+void buffers_init(void);
 
 /*
  * Code Entry
@@ -19,8 +20,10 @@ uint8_t POST_test(void);
 int main(void)
 {
 	/*	Board Initialization	*/
+
 	board_init();
 	printf("\n\rProgram Start");
+	buffers_init();
 
 	/*----------------------------------------------------------------------------
 	  MAIN function
@@ -28,7 +31,6 @@ int main(void)
 		Change definition of USE_UART_INTERRUPTS in UART.h to select polled or
 		interrupt-driven communication.
 		 *----------------------------------------------------------------------------*/
-		uint8_t buffer[80], c, * bp;
 
 		Init_UART0(115200);
 
@@ -39,34 +41,14 @@ int main(void)
 
 		// Code listing 8.9, p. 233
 		while (1) {
-			c = UART0_Receive_Poll();
-			UART0_Transmit_Poll(c);
+			uart_echo_blocking();
 		}
 	#elif USE_UART_INTERRUPTS==1 // Interrupt version of code
 		Send_String("\n\rHello, World!\n\r");
 
 		// Code listing 8.10, p. 234
 		while (1) {
-			// Blocking receive
-			while (Q_Size(&RxQ) == 0)
-				; // wait for character to arrive
-			c = Q_Dequeue(&RxQ);
-
-			// Blocking transmit
-			sprintf((char *) buffer, "You pressed %c\n\r", c);
-			// enqueue string
-			bp = buffer;
-			while (*bp != '\0') {
-				// copy characters up to null terminator
-				while (Q_Full(&TxQ))
-					; // wait for space to open up
-				Q_Enqueue(&TxQ, *bp);
-				bp++;
-			}
-			// start transmitter if it isn't already running
-			if (!(UART0->C2 & UART0_C2_TIE_MASK)) {
-				UART0->C2 |= UART0_C2_TIE(1);
-			}
+			uart_echo();
 		}
 	#endif
 
@@ -89,4 +71,14 @@ uint8_t POST_test(void)
 		return 1;
 	}
 	return 0;
+}
+
+
+
+void buffers_init(void)
+{
+	Tx = malloc(sizeof(buffer_t));
+	Rx = malloc(sizeof(buffer_t));
+	init_buffer(Rx, 100);
+	init_buffer(Tx, 100);
 }

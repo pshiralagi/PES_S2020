@@ -1,66 +1,92 @@
 #include "buffer.h"
 
-void Q_Init(Q_T * q) {
-  unsigned int i;
-  for (i=0; i<Q_MAX_SIZE; i++)
-    q->Data[i] = '_';  // to simplify our lives when debugging
-  q->Head = 0;
-  q->Tail = 0;
-  q->Size = 0;
+buffer_status isBufferInitialized(buffer_t *q)
+{
+	if(((q->head)==(q->tail)) && ((q->count)!=(q->size)) && (q->count == 0))
+		return success;
+	return fail;
+
 }
 
-int Q_Empty(Q_T * q) {
-  return q->Size == 0;
+buffer_status isPointerValid(buffer_t *q)
+{
+    if((q->buffer==(NULL)))
+    	return fail;
+    return success;
+
 }
 
-int Q_Full(Q_T * q) {
-  return q->Size == Q_MAX_SIZE;
+buffer_status bufferAdd(buffer_t *q, uint8_t data)
+{
+
+	if(isBufferFull(q)==buff_full)
+	{
+		return buff_full;
+	}
+	*(q->head)=data;
+	if((q->head)==(q->buffer+q->size-1))
+	{
+		 (q->head)=(q->buffer);
+	}
+	else
+	{
+		q->head=q->head+1;
+	}
+	q->count=q->count+1;
+	return success;
+}
+buffer_status bufferRemove(buffer_t *q, uint8_t *data){
+    if(isBufferEmpty(q)==buff_empty)
+		return buff_empty;
+
+  	*data=*(q->tail);
+	if((q->tail)==(q->buffer+q->size-1))
+		{
+		 	(q->tail)=(q->buffer);
+		}
+	else
+		{
+			(q->tail)=(q->tail)+1;
+		}
+		(q->count)=(q->count)-1;
+	return success;
 }
 
-int Q_Size(Q_T * q) {
-	return q->Size;
+buffer_status isBufferFull(buffer_t *q)
+{
+
+	if(((q->count)==(q->size))&&((q->head)==(q->tail)))
+		return buff_full;
+	return success;
+
 }
 
-int Q_Enqueue(Q_T * q, uint8_t d) {
-	uint32_t masking_state;
-  // If queue is full, don't overwrite data, but do return an error code
-  if (!Q_Full(q)) {
-    q->Data[q->Tail++] = d;
-    q->Tail %= Q_MAX_SIZE;
-
-		// protect q->Size++ operation from preemption
-		// save current masking state
-		masking_state = __get_PRIMASK();
-		// disable interrupts
-		__disable_irq();
-		// update variable
-    q->Size++;
-		// restore  interrupt masking state
-		__set_PRIMASK(masking_state);
-
-    return 1; // success
-  } else
-    return 0; // failure
+buffer_status isBufferEmpty(buffer_t *q)
+{
+	if(((q->count)!=(q->size))&&((q->head)==(q->tail)))
+		return buff_empty;
+	return success;
 }
 
-uint8_t Q_Dequeue(Q_T * q) {
-	uint32_t masking_state;
-  uint8_t t=0;
-  // Check to see if queue is empty before dequeueing
-  if (!Q_Empty(q)) {
-    t = q->Data[q->Head];
-    q->Data[q->Head++] = '_'; // empty unused entries for debugging
-		q->Head %= Q_MAX_SIZE;
-
-		// protect q->Size-- operation from preemption
-		// save current masking state
-		masking_state = __get_PRIMASK();
-		// disable interrupts
-		__disable_irq();
-		// update variable
-    q->Size--;
-		// restore  interrupt masking state
-		__set_PRIMASK(masking_state);
-  }
-  return t;
+buffer_status init_buffer(buffer_t *q, size_t size)
+{
+	q->size=size;
+	q->buffer=(uint8_t*)malloc(sizeof(uint8_t)*size);
+	q->head=q->buffer;
+	q->tail=q->buffer;
+	q->count=0;
+	return isBufferInitialized(q);
 }
+
+buffer_status destroy_buffer(buffer_t *q){
+
+	uint8_t *p;
+	p=q->buffer;
+	while(p != NULL)
+	{
+		p=NULL;
+		p++;
+	}
+	return success;
+}
+
