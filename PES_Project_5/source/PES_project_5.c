@@ -11,8 +11,6 @@
  *
  */
 #include "general.h"
-bool state_machine_1, state_machine_2, state_machine_3;
-uint8_t POST_test(void);
 void buffers_init(void);
 
 /*
@@ -53,22 +51,6 @@ int main(void)
 
 	while(1);
 
-}
-
-
-/*
- * @brief : Power On Self Test verifies that the SPI loop is complete
- */
-uint8_t POST_test(void)
-{
-	if(Test_SPI_Loopback()==1)
-	{
-#ifdef DEBUG_MODE
-		log_func_Str(DebugMode, POST, "Test Passed");
-#endif
-		return 1;
-	}
-	return 0;
 }
 
 

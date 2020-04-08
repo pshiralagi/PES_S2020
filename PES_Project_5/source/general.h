@@ -35,11 +35,7 @@
 #include "timer.h"
 #include "led.h"
 #include "board_init.h"
-#include "fsm.h"
 #include "log.h"
-#include "spi.h"
-#include "i2c.h"
-#include "acc.h"
 #include "buffer.h"
 #include "uart.h"
 
