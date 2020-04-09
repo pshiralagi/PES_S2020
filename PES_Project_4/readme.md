@@ -17,6 +17,10 @@ described in the Assignment 4
 a picture of the oscilloscope sending out an A (01000001). 
 Please see the [A_SPI.jpg file](./doc/A_SPI.jpg)
 
+The full video demo is available in the [Demo.mp4 file](./doc/Demo.mp4)
+
+Printed read out of accelerometer values are available in [accelerometer_values.pdf file](./doc/accelerometer_values.pdf)
+
 I do not have any memory device I can connect to the oscilloscope at home. Please forgive the low image quality.
 
 - fsm1 is the state driven state machine that uses a polling i2c method to obtain accelerometer values
