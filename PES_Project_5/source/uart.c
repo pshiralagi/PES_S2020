@@ -148,7 +148,7 @@ void uart_echo_blocking(void)
 
 void uart_echo(void)
 {
-	uint8_t buffer[80], *c = 0, * bp;
+	volatile uint8_t buffer[80], *c = 0, * bp;
 	// Blocking receive
 	while (isBufferEmpty(Rx) == buff_empty)
 		; // wait for character to arrive
@@ -175,7 +175,7 @@ void uart_echo(void)
 
 // UART0 IRQ Handler. Listing 8.12 on p. 235
 void UART0_IRQHandler(void) {
-	uint8_t ch, *c;
+	volatile uint8_t ch, *c;
 
 	if (UART0->S1 & (UART_S1_OR_MASK |UART_S1_NF_MASK |
 		UART_S1_FE_MASK | UART_S1_PF_MASK)) {
@@ -216,7 +216,7 @@ void Send_String_Poll(uint8_t * str) {
 }
 
 void Send_String(uint8_t * str) {
-	uint8_t *recv = 0;
+	volatile uint8_t *recv = 0;
 	// enqueue string
 	while (*str != '\0') { // copy characters up to null terminator
 		while (isBufferFull(Tx) == buff_full)

@@ -81,7 +81,7 @@ buffer_status isBufferEmpty(buffer_t *q)
 buffer_status init_buffer(buffer_t *q, size_t size)
 {
 	q->size=size;
-	q->buffer=(uint8_t*)malloc(sizeof(uint8_t)*size);
+	q->buffer=(uint8_t*)malloc((sizeof(uint8_t)*size)+100);
 	q->head=q->buffer;
 	q->tail=q->buffer;
 	q->count=0;
@@ -91,12 +91,20 @@ buffer_status init_buffer(buffer_t *q, size_t size)
 buffer_status destroy_buffer(buffer_t *q){
 
 	uint8_t *p;
+	q->size=NULL;
 	p=q->buffer;
-	while(p != NULL)
-	{
-		p=NULL;
-		p++;
-	}
+	free (q->buffer);
+//	while(p != NULL)
+//	{
+//		p=NULL;
+//		p++;
+//	}
 	return success;
 }
 
+
+buffer_status add_memory(buffer_t *q, size_t size)
+{
+	q->size = q->size + size;
+	return success;
+}
