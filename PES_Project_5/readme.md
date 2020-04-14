@@ -15,7 +15,7 @@ This repository contains C code for project 5 as described in Assignment 5 of th
 5. Baud rate is set to **115200**
 
 
-it can be viewed on Drive [Demo.mp4](https://drive.google.com/drive/folders/1Vx6lowz5C3nJvHKWkffDN4oPMSB9GWGV?usp=sharing "Demo Video link")
+Demo video can be viewed on Drive [Demo.mp4](https://drive.google.com/drive/folders/1Vx6lowz5C3nJvHKWkffDN4oPMSB9GWGV?usp=sharing "Demo Video link")
 FMEA is available in the [FMEA.pdf file](./doc/FMEA.pdf)
 
 The three primary modes it can be run in are - 

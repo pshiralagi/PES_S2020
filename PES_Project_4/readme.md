@@ -17,7 +17,7 @@ described in the Assignment 4
 a picture of the oscilloscope sending out an A (01000001). 
 Please see the [A_SPI.jpg file](./doc/A_SPI.jpg)
 
-The full video demo is available in the [Demo.mp4 file](./doc/Demo.mp4)
+it can be viewed on Drive [Demo.mp4](https://drive.google.com/drive/folders/16nQBLe9fvAS2s-ByGluDAprDUm0cBKMg?usp=sharing "Demo Video link")
 
 Printed read out of accelerometer values are available in [accelerometer_values.pdf file](./doc/accelerometer_values.pdf)
 
