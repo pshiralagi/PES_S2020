@@ -180,7 +180,7 @@ void uart_echo(void)
 		; // wait for character to arrive
 	bufferRemove(Rx, &c);
 	// Blocking transmit
-	sprintf((char *) buffer, "%c", c);
+	sprintf((char *) buffer, "%c", *c);
 	// enqueue string
 	bp = buffer;
 
@@ -196,19 +196,19 @@ void uart_echo(void)
 	if (!(UART0->C2 & UART0_C2_TIE_MASK)) {
 		bufferRemove(Tx, &c);
 		START_CRITICAL();
-		UART0->D = (uint32_t)c;
+		UART0->D = *c;
 		END_CRITICAL();
 		UART0->C2 |= UART0_C2_TIE(1);
 	}
 }
 /********Application mode Interrupt****************/
 void uart_app_mode_int(void){
-	 uint8_t *c = 0;
+	 volatile uint8_t *c = 0;
 		// Blocking receive
 		while (isBufferEmpty(Rx) == buff_empty)
 			; // wait for character to arrive
 		bufferRemove(Rx, &c);
-		app_mode_char_int[charcountint] = (uint32_t)c;
+		app_mode_char_int[charcountint] = *c;
 		j++;
 		charcountint++;
 	if(j==10){
@@ -220,7 +220,7 @@ void uart_app_mode_int(void){
 
 // UART0 IRQ Handler. Listing 8.12 on p. 235
 void UART0_IRQHandler(void) {
-	volatile uint8_t ch, *c;
+	volatile uint8_t ch, *c=0;
 
 	START_CRITICAL();
 	if (UART0->S1 & (UART_S1_OR_MASK |UART_S1_NF_MASK |
@@ -246,7 +246,7 @@ void UART0_IRQHandler(void) {
 		// can send another character
 		if (isBufferEmpty(Tx)!=buff_empty) {
 			bufferRemove(Tx, &c);
-			UART0->D = (uint32_t)c;
+			UART0->D = *c;
 		} else {
 			// queue is empty so disable transmitter interrupt
 			UART0->C2 &= ~UART0_C2_TIE_MASK;
@@ -289,15 +289,15 @@ void Send_String(char* str) {
 	// start transmitter if it isn't already running
 	if (!(UART0->C2 & UART0_C2_TIE_MASK)) {
 		bufferRemove(Tx, &recv);
-		UART0->D = (uint32_t)recv;
+		UART0->D = *recv;
 		UART0->C2 |= UART0_C2_TIE(1);
 	}
 }
 
 
-uint8_t	* Get_Rx_Char(void) {
-	uint8_t *rec = 0;
-	bufferRemove(Tx, rec);
+volatile uint8_t* Get_Rx_Char(void) {
+	volatile uint8_t *rec = 0;
+	bufferRemove(Tx, &rec);
 	return rec;
 }
 

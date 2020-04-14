@@ -28,7 +28,7 @@ typedef enum {
 
 
 buffer_status bufferAdd(buffer_t *q, 	uint8_t data);
-buffer_status bufferRemove(buffer_t *q, uint8_t *data);
+buffer_status bufferRemove(buffer_t *q, volatile uint8_t **data);
 buffer_status isBufferFull(buffer_t *q);
 buffer_status isBufferEmpty(buffer_t *q);
 buffer_status init_buffer(buffer_t *q, size_t size);

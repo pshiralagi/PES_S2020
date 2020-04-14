@@ -10,7 +10,7 @@
 
 #include "general.h"
 
-#define USE_UART_INTERRUPTS 	(0) // 0 for polled UART communications, 1 for interrupt-driven
+#define USE_UART_INTERRUPTS 	(1) // 0 for polled UART communications, 1 for interrupt-driven
 #define UART_OVERSAMPLE_RATE 	(16)
 #define BUS_CLOCK 						(24e6)
 #define SYS_CLOCK							(48e6)
@@ -22,7 +22,7 @@ uint8_t UART0_Receive_Poll(void);
 void Send_String_Poll(char *str);
 void Send_String(char *str);
 
-uint8_t	* Get_Rx_Char(void);
+volatile uint8_t* Get_Rx_Char(void);
 uint8_t tx_ready(void);
 void tx_data(uint8_t data);
 uint8_t rx_ready(void);

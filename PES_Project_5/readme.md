@@ -14,6 +14,10 @@ This repository contains C code for project 5 as described in Assignment 5 of th
 4. Implemented `bufferExtendFunction` if circular buffer is full for extra credit. Function replaces `bufferAdd`. Tested using unitTests.
 5. Baud rate is set to **115200**
 
+
+it can be viewed on Drive [Demo.mp4](https://drive.google.com/drive/folders/1Vx6lowz5C3nJvHKWkffDN4oPMSB9GWGV?usp=sharing "Demo Video link")
+FMEA is available in the [FMEA.pdf file](./doc/FMEA.pdf)
+
 The three primary modes it can be run in are - 
 ### NORMAL_MODE - Only basic UART prints based on APPLICATION_MODE or ECHO_MODE which are also selected in 'general.h'
 ### DEBUG_MODE - Increased logging to help debug or better understand code flow
@@ -57,6 +61,7 @@ Each source file has its own header file.
 
 - Combining the `extendBufferAdd` with `bufferAdd` creates problems because of the way `isBufferFull` works
   it is fine if used seperately though, or if `extendBufferAdd` is used before buffer is full
+- Faced some problems with double pointers
 
 ## Execution Notes
 

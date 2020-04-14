@@ -65,12 +65,12 @@ buffer_status bufferExtendAdd(buffer_t *q, uint8_t data)
 }
 
 /******Remove Element from buffer******************/
-buffer_status bufferRemove(buffer_t *q, uint8_t *data){
+buffer_status bufferRemove(buffer_t *q, volatile uint8_t **data){
     if(isBufferEmpty(q)==buff_empty)
 		return buff_empty;
 
     START_CRITICAL();
-  	*data=*(q->tail);
+  	*data=(q->tail);
 	if((q->tail)==(q->buffer+q->size-1))
 		{
 		 	(q->tail)=(q->buffer);
