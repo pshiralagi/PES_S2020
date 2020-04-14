@@ -64,16 +64,19 @@ void led_init(void)
 		//Set Green Led off
 		PTB->PSOR = MASK(GREEN_LED_PIN);
 	}
+	/*********Set Blue LED*********/
 	void Start_Test(void){
 		blue_led_on();
 		red_led_off();
 		green_led_off();
 	}
+	/*********Set green LED*********/
 	void Success_Test(void){
 		blue_led_off();
 		red_led_off();
 		green_led_on();
 	}
+	/*********Set red LED*********/
 	void Fail_Test(void){
 		blue_led_off();
 		red_led_on();

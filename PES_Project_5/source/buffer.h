@@ -9,7 +9,7 @@
 #define BUFFER_H
 
 #include "general.h"
-
+/******Structure to determine pointer of buffer***/
 typedef struct {
 	uint8_t *buffer;	//pointer to the buffer
 	uint8_t *head;		//Where to add an item
@@ -18,9 +18,9 @@ typedef struct {
 	size_t count;	//number of items currently in the buffer
 	}buffer_t;
 
-
+/*******Enum determining status of buffer***********/
 typedef enum {
-	success,
+	success = 0,
 	buff_full,
 	buff_empty,
 	fail
@@ -35,6 +35,9 @@ buffer_status init_buffer(buffer_t *q, size_t size);
 buffer_status destroy_buffer(buffer_t *q);
 buffer_status isPointerValid(buffer_t *q);
 buffer_status isBufferInitialized(buffer_t*q);
+buffer_status add_memory(buffer_t *q, size_t size);
+buffer_status bufferExtendAdd(buffer_t *q, uint8_t data);
+void displayBuffer(buffer_t *q);
 
 extern buffer_t * Tx;
 extern buffer_t * Rx;

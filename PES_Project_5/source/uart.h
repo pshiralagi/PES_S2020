@@ -19,8 +19,8 @@ void Init_UART0(uint32_t baud_rate);
 void UART0_Transmit_Poll(uint8_t data);
 uint8_t UART0_Receive_Poll(void);
 
-void Send_String_Poll(uint8_t * str);
-void Send_String(uint8_t * str);
+void Send_String_Poll(char *str);
+void Send_String(char *str);
 
 uint8_t	* Get_Rx_Char(void);
 uint8_t tx_ready(void);
@@ -29,6 +29,9 @@ uint8_t rx_ready(void);
 uint8_t rx_data(void);
 void uart_echo_blocking(void);
 void uart_echo(void);
+void uart_app_mode(void);
+void uart_app_mode_int(void);
+void Send_Number(uint32_t number);
 
 
 

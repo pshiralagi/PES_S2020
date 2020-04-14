@@ -14,6 +14,14 @@
 
 buffer_t * Tx;
 buffer_t * Rx;
+buffer_t * ap;
+
+uint8_t app_mode_char[100];
+uint8_t temp[100];
+uint8_t app_mode_char_int[100];
+uint8_t i = 0, j=0;
+uint16_t charcount=0;
+uint16_t charcountint=0;
 
 struct __FILE
 {
@@ -40,7 +48,6 @@ int fgetc(FILE *f){
 // Code listing 8.8, p. 231
 void Init_UART0(uint32_t baud_rate) {
 	uint16_t sbr;
-	uint8_t temp;
 
 	// Enable clock gating for UART0 and Port A
 	SIM->SCGC4 |= SIM_SCGC4_UART0_MASK;
@@ -97,22 +104,24 @@ void Init_UART0(uint32_t baud_rate) {
 	UART0->C2 |= UART0_C2_RE(1) | UART0_C2_TE(1);
 
 	// Clear the UART RDRF flag
-	temp = UART0->D;
+	UART0->D;
 	UART0->S1 &= ~UART0_S1_RDRF_MASK;
 
 }
 
-
+/*******transmit ready***********/
 uint8_t tx_ready(void)
 {
 	if (UART0->S1 & UART0_S1_TDRE_MASK)
 		return 1;
 	return 0;
 }
-
+/************Transmit Data*************/
 void tx_data(uint8_t data)
 {
+	START_CRITICAL();
 	UART0->D = data;
+	END_CRITICAL();
 }
 // Code listing 8.9, p. 233
 void UART0_Transmit_Poll(uint8_t data) {
@@ -121,31 +130,48 @@ void UART0_Transmit_Poll(uint8_t data) {
 		tx_data(data);
 
 }
-
+/********Receive Ready****************/
 uint8_t rx_ready(void)
 {
 	if (UART0->S1 & UART0_S1_RDRF_MASK)
 		return 1;
 	return 0;
 }
-
+/********Receive Data****************/
 uint8_t rx_data (void)
 {
 	return UART0->D;
 }
+/********Receive Data Polling****************/
 uint8_t UART0_Receive_Poll(void) {
 		while (!(rx_ready()))
 			;
 		return rx_data();
 }
-
+/********Echo characters polling****************/
 void uart_echo_blocking(void)
 {
 	uint8_t c;
+	Start_Test();
 	c = UART0_Receive_Poll();
 	UART0_Transmit_Poll(c);
-}
+	Success_Test();
 
+}
+/********Application mode****************/
+void uart_app_mode(void){
+	uint8_t c;
+	c = UART0_Receive_Poll();
+	app_mode_char[charcount] = c;
+	charcount++;
+	i++;
+	if(i==10){
+		string_manipulation_poll(app_mode_char);
+		Success_Test();
+		i=0;
+	}
+}
+/********Echo characters interrupt****************/
 void uart_echo(void)
 {
 	volatile uint8_t buffer[80], *c = 0, * bp;
@@ -153,23 +179,42 @@ void uart_echo(void)
 	while (isBufferEmpty(Rx) == buff_empty)
 		; // wait for character to arrive
 	bufferRemove(Rx, &c);
-
 	// Blocking transmit
-	sprintf((char *) buffer, "You pressed %c\n\r", c);
+	sprintf((char *) buffer, "%c", c);
 	// enqueue string
 	bp = buffer;
+
 	while (*bp != '\0') {
 		// copy characters up to null terminator
 		while (isBufferFull(Tx) == buff_full)
 			; // wait for space to open up
 		bufferAdd(Tx, *bp);
 		bp++;
+
 	}
 	// start transmitter if it isn't already running
 	if (!(UART0->C2 & UART0_C2_TIE_MASK)) {
 		bufferRemove(Tx, &c);
-		UART0->D = c;
+		START_CRITICAL();
+		UART0->D = (uint32_t)c;
+		END_CRITICAL();
 		UART0->C2 |= UART0_C2_TIE(1);
+	}
+}
+/********Application mode Interrupt****************/
+void uart_app_mode_int(void){
+	 uint8_t *c = 0;
+		// Blocking receive
+		while (isBufferEmpty(Rx) == buff_empty)
+			; // wait for character to arrive
+		bufferRemove(Rx, &c);
+		app_mode_char_int[charcountint] = (uint32_t)c;
+		j++;
+		charcountint++;
+	if(j==10){
+		string_manipulation_int(app_mode_char_int);
+		Success_Test();
+		j=0;
 	}
 }
 
@@ -177,6 +222,7 @@ void uart_echo(void)
 void UART0_IRQHandler(void) {
 	volatile uint8_t ch, *c;
 
+	START_CRITICAL();
 	if (UART0->S1 & (UART_S1_OR_MASK |UART_S1_NF_MASK |
 		UART_S1_FE_MASK | UART_S1_PF_MASK)) {
 			// clear the error flags
@@ -200,22 +246,38 @@ void UART0_IRQHandler(void) {
 		// can send another character
 		if (isBufferEmpty(Tx)!=buff_empty) {
 			bufferRemove(Tx, &c);
-			UART0->D = c;
+			UART0->D = (uint32_t)c;
 		} else {
 			// queue is empty so disable transmitter interrupt
 			UART0->C2 &= ~UART0_C2_TIE_MASK;
 		}
 	}
+	END_CRITICAL();
 }
-
-void Send_String_Poll(uint8_t * str) {
+/********Send string polling mode****************/
+void Send_String_Poll(char * str) {
 	// enqueue string
 	while (*str != '\0') { // Send characters up to null terminator
 		UART0_Transmit_Poll(*str++);
 	}
 }
+/********send number polling****************/
+void Send_Number(uint32_t number)
+{
+    uint8_t temp, i=0;
+    uint8_t a[2];
+    for(i=0;i<2;i++)
+    {
+        temp = number % 10;
+        a[i] = temp;
+        number = number / 10;
+    }
+    for(i=0;i<2;i++)
+    	UART0_Transmit_Poll(a[1-i]+'0');
+}
 
-void Send_String(uint8_t * str) {
+/********Send string Interrupt****************/
+void Send_String(char* str) {
 	volatile uint8_t *recv = 0;
 	// enqueue string
 	while (*str != '\0') { // copy characters up to null terminator
@@ -227,7 +289,7 @@ void Send_String(uint8_t * str) {
 	// start transmitter if it isn't already running
 	if (!(UART0->C2 & UART0_C2_TIE_MASK)) {
 		bufferRemove(Tx, &recv);
-		UART0->D = recv;
+		UART0->D = (uint32_t)recv;
 		UART0->C2 |= UART0_C2_TIE(1);
 	}
 }

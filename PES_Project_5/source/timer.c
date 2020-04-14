@@ -2,7 +2,7 @@
  * @filename : time.h
  *
  *  @date : Feb 6, 2020
- *  @description : Header file for i2c.c
+ *  @description : Source file for timer.c
  *
  *    	@author : Pavan Shiralagi and Antara Prakash
  */
@@ -12,6 +12,10 @@
 /*	@brief : Wait function, waits in milliseconds using a while loop
  * @param : time is time to wait for in milliseconds
  */
+
+uint8_t hr=0, min=0, sec=0, ms;
+char tstamp[20];
+char hour[4], minutes[2], seconds[2], milliseconds[3];
 void wait_ms(volatile uint32_t time)
 {
 	time = time*4250;	//Values tested on oscilloscope
@@ -21,40 +25,50 @@ void wait_ms(volatile uint32_t time)
 	}
 }
 
-///*
-// * @brief : Initialize systick and provide delay based on value of param, polls touch slider till time complete
-// * @param : ticks is the number of ticks to wait
-// * @reference : https://hasanyavuz.ozderya.net/?p=393
-// */
-//void cap_delay_ticks(unsigned ticks)
-//{
-//    SysTick->LOAD = ticks;
-//    SysTick->VAL = 0;
-//    SysTick->CTRL = SysTick_CTRL_ENABLE_Msk;
-//
-//    // COUNTFLAG is a bit that is set to 1 when counter reaches 0.
-//    // It's automatically cleared when read.
-//    while ((SysTick->CTRL & SysTick_CTRL_COUNTFLAG_Msk) == 0)
-//    	{
-//    		cap_val = touch_scan();//Obtaining capacitance slider value;
-//    	}
-//    SysTick->CTRL = 0;
-//}
-
-void SysTick_delay(uint8_t seconds)
+/*************initializing timer********************/
+void SysTick_delay(void)
 {
 	//Interrupt at 3s
-	SysTick->LOAD = seconds*(48000000L/16);
+	SysTick->LOAD = (48000000L/16)*0.1;
 	NVIC_EnableIRQ(SysTick_IRQn);
 	NVIC_SetPriority(SysTick_IRQn, 3);
 	SysTick->VAL = 0;
 	SysTick->CTRL = SysTick_CTRL_TICKINT_Msk | SysTick_CTRL_ENABLE_Msk;
 }
 
+/************Handler to count time**************/
+void SysTick_Handler(void)
+{
+	START_CRITICAL();
+	ms += 10;
+		if(ms == 100)
+		{
+			ms = 0;
+			sec += 1;
+			if(sec == 60)
+			{
+				sec = 0;
+				min += 1;
 
-//void SysTick_Handler(void)
-//{
-//	interrupt_clear = true;
-//
-//	NVIC_DisableIRQ(SysTick_IRQn);
-//}
+				if(min == 60)
+				{
+					hr += 1;
+					min = 0;
+
+				}
+			}
+		}
+		END_CRITICAL();
+}
+/***************print values of calculated time***********/
+void timestamp(void){
+
+	Send_Number(hr);
+	Send_String_Poll(":");
+	Send_Number(min);
+	Send_String_Poll(":");
+	Send_Number(sec);
+	Send_String_Poll(":");
+	Send_Number(ms);
+}
+

@@ -18,111 +18,132 @@
 #include "UnitTest.h"
 
 
-
+/*
+ *
+ *
+ *
+• Verify wrap remove (test that your buffer tail point can wrap around the edge boundary when a remove occurs at the boundary)
+• Verify wrap add (test that your buffer can wrap around the edge boundary and add to the front)
+ *
+ *
+ */
 
 
 /********* Unit Test function definition *********/
 
-#define ADDRESS 0x3A
-#define REG_CTRL1 0x2A
-#define REG_XHI 0x01
-
 void unit_test(void){
 
-		uint8_t status;
-		uint16_t data;
-		int i=0;
-    	/************ Initialization *************/
+		//uint8_t buffer_size;
+		buffer_t *q;
+		uint8_t size = 2;
+		uint8_t data1 = 15;
+		uint8_t data2 = 16;
+		uint8_t data3 = 17;
+		buffer_status status;
+		q = malloc(sizeof(buffer_t));
+    	/*********** Initialization ************/
 		UCUNIT_Init();	//initialize framework
 
-		/****************I2C Init********************/
-		i2c_init();	//
-		log_func_Str(Test, initmma, "Initializing I2C");
-		UCUNIT_TestcaseBegin("Initializing I2C");
-		//UCUNIT_CheckIsEqual(i, 1);
+		/***************Buffer Init*******************/
+		status = init_buffer(q,size);	//initialize buffer
+		log_func_Str(Test, initbuffer, "Initializing Circular Buffer");
+		UCUNIT_TestcaseBegin("Initializing Circular Buffer");
+		UCUNIT_CheckIsEqual(status, 0);
 		UCUNIT_TestcaseEnd();
 
-		/*****************SPI INIT******************/
-		Init_SPI1();	//
-		log_func_Str(Test, initmma, "Initializing SPI");
-		UCUNIT_TestcaseBegin("Initializing SPI");
-		//UCUNIT_CheckIsEqual(i, 1);
+		/****************bufferAdd*****************/
+		status = bufferAdd(q,data1);	//
+		log_func_Str(Test, bufferAdd_, "Adding data in the buffer");
+		UCUNIT_TestcaseBegin("Adding data in the buffer");
+		UCUNIT_CheckIsEqual(status, 0);
 		UCUNIT_TestcaseEnd();
 
-		/********** I2C Read test **********/
-		status = i2c_read_byte(ADDRESS, REG_XHI);
-		UCUNIT_TestcaseBegin("I2C read");
-		log_func_Str(Test, i2creadbyte, "reading data");
-		if(status > 0){
-			i = 1;
-		}
-		UCUNIT_CheckIsEqual(i, 1);
+		/********* bufferAdd ***********/
+		status = bufferAdd(q,data2);	//
+		log_func_Str(Test, bufferAdd_, "Adding data in the buffer");
+		UCUNIT_TestcaseBegin("Adding data in the buffer");
+		UCUNIT_CheckIsEqual(status, 0);
 		UCUNIT_TestcaseEnd();
 
-		/********** Accelerometer initialization **********/
-		init_mma();
-		log_func_Str(Test, initmma, "Initializing accelerometer");
-		UCUNIT_TestcaseBegin("Initializing accelerometer");
-		//UCUNIT_CheckIsEqual(i, 1);
+		/************* isBufferFull ************/
+		status = isBufferFull(q);	//
+		log_func_Str(Test, isBufferFull_, "Checking if buffer full");
+		UCUNIT_TestcaseBegin("Checking if buffer full");
+		UCUNIT_CheckIsEqual(status, 1);
 		UCUNIT_TestcaseEnd();
 
-		/************ Read full Xyz**********************/
-		read_full_xyz();
-		log_func_Str(Test, initmma, "READING XYZ");
-		UCUNIT_TestcaseBegin("READING XYZ");
+		/************* bufferAdd ************/
+		status = bufferAdd(q,data3);	//
+		log_func_Str(Test, bufferAdd_, "Adding data in the buffer");
+		UCUNIT_TestcaseBegin("Adding data in the buffer");
+		UCUNIT_CheckIsEqual(status, 1);
 		UCUNIT_TestcaseEnd();
 
-		/************** Accelerometer Read X*************/
-		data = readx();
-		log_func_Str(Test, readx_, "READ X");
-		UCUNIT_TestcaseBegin("READ X");
-		if(data >= 0){
-			i = 1;
-		}
-		UCUNIT_CheckIsEqual(i, 1);
+		/******************bufferRemove*********************/
+		status = bufferRemove(q,&data3);
+		log_func_Str(Test, bufferRemove_, "Removing data from the buffer");
+		UCUNIT_TestcaseBegin("Removing data from buffer");
+		UCUNIT_CheckIsEqual(status, 0);
+		UCUNIT_CheckIsEqual(data3, data1);
+		UCUNIT_TestcaseEnd();
+		/************ isBufferFull ***********/
+		status = bufferExtendAdd(q,data3);
+		log_func_Str(Test, isBufferFull_, "Checking if buffer full");
+		UCUNIT_TestcaseBegin("Checking if buffer full");
+		UCUNIT_CheckIsEqual(status, 0);
+		UCUNIT_TestcaseEnd();
+		/************ isBufferFull ***********/
+		status = bufferExtendAdd(q, data3);
+		log_func_Str(Test, isBufferFull_, "Checking if buffer full");
+		UCUNIT_TestcaseBegin("Checking if buffer full");
+		UCUNIT_CheckIsEqual(status, 0);
 		UCUNIT_TestcaseEnd();
 
-		/************** Accelerometer Read Y*************/
-		data = ready();
-		log_func_Str(Test, ready_, "READ Y");
-		UCUNIT_TestcaseBegin("READ Y");
-		if(data >= 0){
-			i = 1;
-		}
-		UCUNIT_CheckIsEqual(i, 1);
+		/******************bufferRemove*********************/
+		status = bufferRemove(q,&data3);
+		log_func_Str(Test, bufferRemove_, "Removing data from the buffer");
+		UCUNIT_TestcaseBegin("Removing data from buffer");
+		UCUNIT_CheckIsEqual(status, 0);
 		UCUNIT_TestcaseEnd();
 
-		/************** Accelerometer Read Z*************/
-		data = readz();
-		log_func_Str(Test, readz_, "READ Z");
-		UCUNIT_TestcaseBegin("READ Z");
-		if(data >= 0){
-			i = 1;
-		}
-		UCUNIT_CheckIsEqual(i, 1);
+		/******************bufferRemove*********************/
+		status = bufferRemove(q,&data2);
+		log_func_Str(Test, bufferRemove_, "Removing data from the buffer");
+		UCUNIT_TestcaseBegin("Removing data from buffer");
+		UCUNIT_CheckIsEqual(status, 0);
+		UCUNIT_CheckIsEqual(data2, data3);
 		UCUNIT_TestcaseEnd();
 
-		/*********** Touch Screen Test ************/
-    	data = touch_scan();
-    	log_func_Str(Test, touchscan, "capacitive touch test");
-    	UCUNIT_TestcaseBegin("Capacitive Touch");
-    	if(data >= 0){
-    		i = 1;
-    	}
-    	UCUNIT_CheckIsEqual(i, 1);
-    	UCUNIT_TestcaseEnd();
-    	/***************SPI Loopback*******************/
+		/************* bufferRemove************/
+		status = bufferRemove(q,&data1);
+		log_func_Str(Test, bufferRemove_, "Removing data from the buffer");
+		UCUNIT_TestcaseBegin("Removing data from buffer");
+		UCUNIT_CheckIsEqual(status, 0);
+		UCUNIT_CheckIsEqual(data1, data3);
+		UCUNIT_TestcaseEnd();
 
-    	status = Test_SPI_Loopback();
-    	UCUNIT_TestcaseBegin("SPI Loopback");
-    	log_func_Str(Test, TestSPILoopback, "reading data through SPI");
-    	UCUNIT_CheckIsEqual(status, 1);
-    	UCUNIT_TestcaseEnd();
+		/************* isBufferEmpty************/
+		status = isBufferEmpty(q);
+		log_func_Str(Test, isBufferEmpty_, "Checking if buffer is empty");
+		UCUNIT_TestcaseBegin("Checking if buffer is empty");
+		UCUNIT_CheckIsEqual(status, 2);
+		UCUNIT_TestcaseEnd();
 
-    	/************************************************/
+		/************* bufferRemove ************/
+		status = bufferRemove(q,&data1);
+		log_func_Str(Test, bufferRemove_, "Removing data from the empty buffer");
+		UCUNIT_TestcaseBegin("Removing data from empty buffer");
+		UCUNIT_CheckIsEqual(status, 2);
+		UCUNIT_TestcaseEnd();
 
+		/********** destroy_buffer ***********/
+		status = destroy_buffer(q);	//
+		log_func_Str(Test, bufferRemove_, "Destroying circular buffer");
+		UCUNIT_TestcaseBegin("Destroying circular buffer");
+		UCUNIT_CheckIsEqual(status, 0);
+		UCUNIT_TestcaseEnd();
 
-		/*** Test Shutdown ****/
+		/**** Test Shutdown ****/
 		UCUNIT_WriteSummary();
 		if(ucunit_testcases_failed == 0)
 			Success_Test();

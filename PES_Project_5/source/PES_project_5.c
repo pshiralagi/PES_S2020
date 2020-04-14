@@ -23,7 +23,12 @@ int main(void)
 	board_init();
 	printf("\n\rProgram Start");
 	buffers_init();
+	Start_Test();
+	SysTick_delay();
 
+#ifdef TEST_MODE
+	unit_test();
+#endif
 	/*----------------------------------------------------------------------------
 	  MAIN function
 
@@ -31,34 +36,91 @@ int main(void)
 		interrupt-driven communication.
 		 *----------------------------------------------------------------------------*/
 
-		Init_UART0(115200);
+		Init_UART0(115200);	//initializing UART to 115200 baud rate
+#ifdef ECHO_MODE
 
-	 	printf("\n\rGood morning!\n\r");
-
+	 	log_func_Str(DebugMode, mainfunc, "Echo Mode");
 	#if USE_UART_INTERRUPTS==0// Polling version of code
-		Send_String_Poll("\n\rHello, World!\n\r");
+#ifdef NORMAL_MODE
+	 	log_func_Str(normalmode, mainfunc, "Polling mode UART");
+#endif
+#ifdef DEBUG_MODE
+	 	log_func_Str(DebugMode, mainfunc, "Polling mode UART");
+#endif
 
 		while (1) {
-			uart_echo_blocking();
+#ifdef DEBUG_MODE
+		log_func_Str(DebugMode, mainfunc, "Echoed Character");
+#endif
+			uart_echo_blocking(); //Echo's back the characters
+			Success_Test();
+
 		}
 	#elif USE_UART_INTERRUPTS==1 // Interrupt version of code
-		Send_String("\n\rHello, World!\n\r");
+#ifdef NORMAL_MODE
+	 	log_func_Str(normalmode, mainfunc, "Interrupt mode UART");
+#endif
+#ifdef DEBUG_MODE
+		log_func_Str(DebugMode, mainfunc, "Interrupt mode UART mode");
+#endif
 		while (1) {
-			uart_echo();
+#ifdef DEBUG_MODE
+		log_func_Str(DebugMode, mainfunc, "Echoed Character");
+#endif
+			uart_echo(); //Echo's back the characters
+			Success_Test();
 		}
 	#endif
+#endif
 
+#ifdef APPLICATION_MODE
+#ifdef NORMAL_MODE
+		log_func_Str(normalmode, mainfunc, "Application Mode");
+#endif
+#ifdef DEBUG_MODE
+		log_func_Str(DebugMode, mainfunc, "Application Mode");
+#endif
+#if USE_UART_INTERRUPTS==0 // Polling version of code
+#ifdef NORMAL_MODE
+		log_func_Str(normalmode, mainfunc, "UART Application mode Polling");
+#endif
+#ifdef DEBUG_MODE
+		log_func_Str(DebugMode, mainfunc, "UART Application mode Polling");
+#endif
+		while(1){
+#ifdef DEBUG_MODE
+			log_func_Str(DebugMode, uartappmode, "Character Read");
+#endif
+			uart_app_mode(); //application mode function
+		}
+#elif USE_UART_INTERRUPTS==1 // Interrupt version of code
+#ifdef NORMAL_MODE
+		log_func_Str(normalmode, mainfunc, "UART Application mode interrupt");
+#endif
+#ifdef DEBUG_MODE
+		log_func_Str(DebugMode, mainfunc, "UART Application mode interrupt");
+#endif
+		while(1){
+#ifdef DEBUG_MODE
+			log_func_Str(DebugMode, uartappmodeint, "Character Read");
+#endif
+			uart_app_mode_int(); //application mode function
+		}
+#endif
 
+#endif
 	while(1);
 
 }
 
 
-
+/**********initializing buffer size************/
 void buffers_init(void)
 {
+	START_CRITICAL();
 	Tx = malloc(sizeof(buffer_t));
 	Rx = malloc(sizeof(buffer_t));
+	END_CRITICAL();
 	init_buffer(Rx, 100);
 	init_buffer(Tx, 100);
 }

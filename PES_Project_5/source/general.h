@@ -14,16 +14,19 @@
 
 #include <stdio.h>
 #include <stdint.h>
+#include <string.h>
+
+#define APPLICATION_MODE
+//#define ECHO_MODE
 
 //#define TEST_MODE
-//#define DEBUG_MODE
-#define STATUS
+//#define NORMAL_MODE
+#define DEBUG_MODE
+
 
 #ifdef TEST_MODE
 #include "UnitTest.h"
 #endif
-
-
 
 #include "board.h"
 #include "peripherals.h"
@@ -38,8 +41,12 @@
 #include "log.h"
 #include "buffer.h"
 #include "uart.h"
+#include "mode.h"
 
 
+/*******Critical Section Definition**********/
+#define START_CRITICAL() 	__disable_irq()
+#define END_CRITICAL()		__enable_irq()
 
 
 #endif
