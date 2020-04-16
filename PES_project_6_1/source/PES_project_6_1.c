@@ -31,58 +31,71 @@
 /**
  * @file    PES_project_6_1.c
  * @brief   Application entry point.
+ * https://github.com/kylemanna/kinetis-sdk2/blob/master/boards/frdmkl43z/rtos_examples/freertos_swtimer/freertos_swtimer.c
  */
 #include <stdio.h>
+#include <assert.h>
 #include "board.h"
 #include "peripherals.h"
 #include "pin_mux.h"
 #include "clock_config.h"
 #include "MKL25Z4.h"
 #include "fsl_debug_console.h"
+#include "fsl_device_registers.h"
 #include "FreeRTOS.h"
 #include "timers.h"
 #include "dac.h"
+#include "task.h"
 
 
+
+static bool write_flag = 0;
+uint16_t dac_vals[500];
 static void SwTimerCallback(TimerHandle_t xTimer);
 static void dacTask(void *pvParameters);
-static bool write_flag = 0;
 /*
  * @brief   Application entry point.
  */
 int main(void) {
 
   	/* Init board hardware. */
-    BOARD_InitBootPins();
-    BOARD_InitBootClocks();
-    BOARD_InitBootPeripherals();
+    BOARD_InitPins();
+    BOARD_BootClockRUN();
   	/* Init FSL debug console. */
     BOARD_InitDebugConsole();
-
+    SystemCoreClockUpdate();
+    TimerHandle_t SwTimerHandle = NULL;
+    printf("LED Initialized\n\r");
     LED_BLUE_INIT(1);
 
     updateDACvals();
 
     dacInit();
-
-    xTaskCreate(dacTask,  "dacTask", configMINIMAL_STACK_SIZE, NULL, tskIDLE_PRIORITY+2 , NULL);
-
+    SwTimerHandle = xTimerCreate("SwTimer",
+        							 pdMS_TO_TICKS(100),
+                                     pdTRUE,
+                                     0,
+                                     SwTimerCallback);
+    xTimerStart(SwTimerHandle, 0);
+    xTaskCreate(dacTask,  "dacTask", configMINIMAL_STACK_SIZE+10, NULL, tskIDLE_PRIORITY+1 , NULL);
     vTaskStartScheduler();
 
     while(1);
 
 }
 
+
+
+static void SwTimerCallback(TimerHandle_t xTimer)
+{
+	LED_BLUE_TOGGLE();
+	write_flag = 1;
+}
+
+
 static void dacTask(void *pvParameters)
 {
 	static uint16_t i = 0;
-	/* Timer Creation */
-    TimerHandle_t SwTimerHandle = xTimerCreate("SwTimer",          /* Text name. */
-    							 pdMS_TO_TICKS(100), /* Timer period. */
-                                 pdTRUE,             /* Enable auto reload. */
-                                 0,                  /* ID is not used. */
-                                 SwTimerCallback);   /* The callback function. */
-    xTimerStart(SwTimerHandle, 0);
     while(1)
     {
     	if (write_flag)
@@ -96,11 +109,4 @@ static void dacTask(void *pvParameters)
     	}
     }
 }
-
-static void SwTimerCallback(TimerHandle_t xTimer)
-{
-	LED_BLUE_TOGGLE();
-	write_flag = 1;
-}
-
 
