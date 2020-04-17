@@ -29,12 +29,18 @@
  */
  
 /**
- * @file    PES_project_6_1.c
+ * @file    PES_project_6_2.c
  * @brief   Application entry point.
  * https://github.com/kylemanna/kinetis-sdk2/blob/master/boards/frdmkl43z/rtos_examples/freertos_swtimer/freertos_swtimer.c
  */
+
+
+#define NORMAL_MODE
+//#define DEBUG_MODE
+
 #include <stdio.h>
 #include <assert.h>
+#include <myq.h>
 #include "board.h"
 #include "peripherals.h"
 #include "pin_mux.h"
@@ -42,49 +48,46 @@
 #include "MKL25Z4.h"
 #include "fsl_debug_console.h"
 #include "fsl_device_registers.h"
+#include "fsl_dac.h"
+#include "fsl_adc16.h"
 #include "FreeRTOS.h"
+#include "adc_dac.h"
 #include "timers.h"
-#include "dac.h"
 #include "task.h"
 #include "timer.h"
 #include "log.h"
+#include "semphr.h"
+#include "myq.h"
 
-
-
-static bool write_flag = 0;
+TimerHandle_t SwTimerHandle = NULL;
+TimerHandle_t SwTimerHandle_2 = NULL;
+adc16_config_t adc16ConfigStruct;
+adc16_channel_config_t adc16ChannelConfigStruct;
+SemaphoreHandle_t xMutex;
+static bool write_flag = 0, read_flag = 0;
 uint16_t dac_vals[50];
+uint32_t adc_val = 0;
+void BOARD_Init(void);
 static void SwTimerCallback(TimerHandle_t xTimer);
+static void SwTimerCallback_2(TimerHandle_t xTimer);
 static void dacTask(void *pvParameters);
+static void adcTask(void *pvParameters);
 /*
  * @brief   Application entry point.
  */
 int main(void) {
 
-  	/* Init board hardware. */
-    BOARD_InitPins();
-    BOARD_BootClockRUN();
-  	/* Init FSL debug console. */
-    BOARD_InitDebugConsole();
-    SystemCoreClockUpdate();
-    TimerHandle_t SwTimerHandle = NULL;
-#ifdef DEBUG_MODE
-    		log_func_Str(DebugMode, mainFunction, "Blue LED initialized:");
-#endif
-    LED_BLUE_INIT(1);
+
+    BOARD_Init();
 
     updateDACvals();
 #ifdef DEBUG_MODE
     		log_func_Str(DebugMode, mainFunction, "LUT Updated:");
 #endif
 
-    dacInit();
-    SwTimerHandle = xTimerCreate("SwTimer",
-        							 pdMS_TO_TICKS(100),
-                                     pdTRUE,
-                                     0,
-                                     SwTimerCallback);
-    xTimerStart(SwTimerHandle, 0);
-    xTaskCreate(dacTask,  "dacTask", configMINIMAL_STACK_SIZE+10, NULL, tskIDLE_PRIORITY+1 , NULL);
+
+    xTaskCreate(dacTask,  "dacTask", configMINIMAL_STACK_SIZE+100, NULL, tskIDLE_PRIORITY+1 , NULL);
+    xTaskCreate(adcTask,  "adcTask", configMINIMAL_STACK_SIZE+100, NULL, tskIDLE_PRIORITY+1 , NULL);
     vTaskStartScheduler();
 
     while(1);
@@ -95,15 +98,26 @@ int main(void) {
 
 static void SwTimerCallback(TimerHandle_t xTimer)
 {
-	LED_BLUE_TOGGLE();
+//	LED_BLUE_TOGGLE();
 	write_flag = 1;
 	timer_calculation();
+}
+
+static void SwTimerCallback_2(TimerHandle_t xTimer)
+{
+	read_flag = 1;
 }
 
 
 static void dacTask(void *pvParameters)
 {
 	static uint16_t i = 0;
+    SwTimerHandle = xTimerCreate("SwTimer",
+        							 pdMS_TO_TICKS(100),
+                                     pdTRUE,
+                                     0,
+                                     SwTimerCallback);
+    xTimerStart(SwTimerHandle, 0);
     while(1)
     {
     	if (write_flag)
@@ -112,7 +126,9 @@ static void dacTask(void *pvParameters)
 #ifdef DEBUG_MODE
     		log_func_Str(DebugMode, DACtask, "DAC Value:");
 #endif
+#ifdef NORMAL_MODE
     		log_func_Str(NormalMode, DACtask, "");
+#endif
     		Log_Integer(dac_vals[i]);
     		i++;
     		write_flag = 0;
@@ -122,10 +138,73 @@ static void dacTask(void *pvParameters)
 #ifdef DEBUG_MODE
     		log_func_Str(DebugMode, DACtask, "*********Wave Generation Complete*************");
 #endif
+#ifdef NORMAL_MODE
     		log_func_Str(NormalMode, DACtask, "*********Wave Generation Complete*************");
+#endif
     		}
 
     	}
     }
 }
 
+
+static void adcTask(void *pvParameters)
+{
+    SwTimerHandle_2 = xTimerCreate("SwTimer",
+        							 pdMS_TO_TICKS(100),
+                                     pdTRUE,
+                                     0,
+                                     SwTimerCallback_2);
+    xTimerStart(SwTimerHandle_2, 0);
+	while(1)
+	{
+		if (read_flag)
+		{
+		    ADC16_SetChannelConfig(DEMO_ADC16_BASE, DEMO_ADC16_CHANNEL_GROUP, &adc16ChannelConfigStruct);
+			while (0U == (kADC16_ChannelConversionDoneFlag &
+						  ADC16_GetChannelStatusFlags(DEMO_ADC16_BASE, DEMO_ADC16_CHANNEL_GROUP)));
+			adc_val = ADC16_GetChannelConversionValue(DEMO_ADC16_BASE, DEMO_ADC16_CHANNEL_GROUP);  //Obtain ADC value
+			read_flag = 0;
+
+			q_add(&adc_val); //Updating the ADC value to the ADC buffer
+#ifdef DEBUG_MODE
+    		log_func_Str(DebugMode, DACtask, "DAC Value:");
+#endif
+#ifdef NORMAL_MODE
+    		log_func_Str(NormalMode, DACtask, "");
+#endif
+    		Log_Integer(adc_val);
+
+
+		}
+	}
+}
+
+void BOARD_Init(void)
+{
+  	/* Init board hardware. */
+    BOARD_InitPins();
+    BOARD_BootClockRUN();
+  	/* Init FSL debug console. */
+    BOARD_InitDebugConsole();
+    SystemCoreClockUpdate();
+    xMutex = xSemaphoreCreateMutex();
+//    xSemaphoreTake(xMutex, portMAX_DELAY);
+//    xSemaphoreGive(xMutex);
+
+#ifdef DEBUG_MODE
+    		log_func_Str(DebugMode, mainFunction, "LEDs initialized:");
+#endif
+    LED_BLUE_INIT(1);
+    LED_GREEN_INIT(1);
+    LED_RED_INIT(1);
+
+    dacInit();
+
+    adcInit();
+
+    q_init(64, 32);
+
+
+
+}

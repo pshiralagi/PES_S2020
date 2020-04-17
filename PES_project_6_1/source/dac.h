@@ -6,5 +6,5 @@
 #include "fsl_dac.h"
 void updateDACvals(void);
 void dacInit(void);
-extern uint16_t dac_vals[500];
+extern uint16_t dac_vals[50];
 #endif
