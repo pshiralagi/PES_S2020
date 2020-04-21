@@ -30,6 +30,7 @@
 
 #include "fsl_common.h"
 #include "fsl_debug_console.h"
+#include "board.h"
 
 #ifndef NDEBUG
 #if (defined(__CC_ARM)) || (defined(__ICCARM__))
@@ -46,6 +47,7 @@ void __aeabi_assert(const char *failedExpr, const char *file, int line)
 #if SDK_DEBUGCONSOLE
 void __assertion_failed(char *_Expr)
 {
+	LED_RED_ON();
     PRINTF("%s\n", _Expr);
     for (;;)
     {

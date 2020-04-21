@@ -77,6 +77,9 @@ void Log_string(char *string)
 	PRINTF("%s",string);
 }
 
-void Log_Integer(uint16_t intg){
+void Log_Integer(uint32_t intg){
 	PRINTF("%d", intg);
+}
+void Log_Float(uint32_t intg){
+	PRINTF("%f", intg);
 }

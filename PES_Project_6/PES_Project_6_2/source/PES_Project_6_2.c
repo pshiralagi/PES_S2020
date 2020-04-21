@@ -1,13 +1,11 @@
 /*
  * Copyright 2016-2020 NXP
  * All rights reserved.
- */
-
- 
-/**
+ *
  * @file    PES_project_6_2.c
+ * @author	Pavan Shiralagi and Antara Prakash
  * @brief   Application entry point.
- * https://github.com/kylemanna/kinetis-sdk2/blob/master/boards/frdmkl43z/rtos_examples/freertos_swtimer/freertos_swtimer.c
+ *  @reference https://github.com/kylemanna/kinetis-sdk2/blob/master/boards/frdmkl43z/rtos_examples/freertos_swtimer/freertos_swtimer.c
  */
 
 
@@ -36,19 +34,22 @@
 #include "DMA.h"
 #include "dsp.h"
 
-TimerHandle_t SwTimerHandle = NULL;
-TimerHandle_t SwTimerHandle_2 = NULL;
+TaskHandle_t xdacTaskHandle = NULL;
+TaskHandle_t xadcTaskHandle = NULL;
+TimerHandle_t dacTimerHandle = NULL;
+TimerHandle_t adcTimerHandle = NULL;
 adc16_config_t adc16ConfigStruct;
 adc16_channel_config_t adc16ChannelConfigStruct;
 SemaphoreHandle_t xMutex;
+const TickType_t xDelay = 500 / portTICK_PERIOD_MS;
 static bool write_flag = 0, read_flag = 0, dsp_ready = 0;
 uint8_t i = 0;
 uint16_t dac_vals[50];
 uint32_t adc_val = 0;
 uint32_t min, max, avg, Sd;
 void BOARD_Init(void);
-static void SwTimerCallback(TimerHandle_t xTimer);
-static void SwTimerCallback_2(TimerHandle_t xTimer);
+static void dacTimerCallback(TimerHandle_t xTimer);
+static void adcTimerCallback(TimerHandle_t xTimer);
 static void dacTask(void *pvParameters);
 static void adcTask(void *pvParameters);
 static void dspTask(void *pvParameters);
@@ -59,19 +60,19 @@ int main(void) {
 
 
     BOARD_Init();
-
+    LED_BLUE_INIT(1);
+    LED_RED_INIT(1);
+    LED_GREEN_INIT(1);
     updateDACvals();
 #ifdef DEBUG_MODE
     		log_func_Str(DebugMode, mainFunction, "LUT Updated:");
 #endif
 
 
-    /*assert(xTaskCreate(dacTask,  "dacTask", configMINIMAL_STACK_SIZE+100, NULL, tskIDLE_PRIORITY+1 , NULL) == pdPASS);
-    assert(xTaskCreate(adcTask,  "adcTask", configMINIMAL_STACK_SIZE+100, NULL, tskIDLE_PRIORITY+1 , NULL) == pdPASS);
-    assert(xTaskCreate(dspTask, "dspTask", configMINIMAL_STACK_SIZE+100, NULL, tskIDLE_PRIORITY+1, NULL) == pdPASS);*/
-	xTaskCreate(dacTask,  "dacTask", configMINIMAL_STACK_SIZE+10, NULL, tskIDLE_PRIORITY+1 , NULL);
-	xTaskCreate(adcTask,  "adcTask", configMINIMAL_STACK_SIZE+10, NULL, tskIDLE_PRIORITY+1 , NULL);
-	xTaskCreate(dspTask, "dspTask", configMINIMAL_STACK_SIZE+10, NULL, tskIDLE_PRIORITY+1, NULL);
+    assert(xTaskCreate(dacTask,  "dacTask", configMINIMAL_STACK_SIZE+100, NULL, tskIDLE_PRIORITY+1 , &xdacTaskHandle) == pdPASS); 	/*RED LED switched on if assert fails*/
+    assert(xTaskCreate(adcTask,  "adcTask", configMINIMAL_STACK_SIZE+100, NULL, tskIDLE_PRIORITY+1 , &xadcTaskHandle) == pdPASS);
+    assert(xTaskCreate(dspTask, "dspTask", configMINIMAL_STACK_SIZE+100, NULL, tskIDLE_PRIORITY+1, NULL) == pdPASS);
+
     vTaskStartScheduler();
 
 
@@ -81,28 +82,32 @@ int main(void) {
 
 
 
-static void SwTimerCallback(TimerHandle_t xTimer)
+static void dacTimerCallback(TimerHandle_t xTimer)
 {
-//	LED_BLUE_TOGGLE();
+	 xSemaphoreTake(xMutex, portMAX_DELAY);
+	 LED_BLUE_OFF();
+	LED_GREEN_TOGGLE();
+	xSemaphoreGive(xMutex);
 	write_flag = 1;
 	timer_calculation();
 }
 
-static void SwTimerCallback_2(TimerHandle_t xTimer)
+static void adcTimerCallback(TimerHandle_t xTimer)
 {
 	read_flag = 1;
+
 }
 
-
+/*DAC Task*/
 static void dacTask(void *pvParameters)
 {
 	static uint16_t i = 0;
-    SwTimerHandle = xTimerCreate("SwTimer",
+    dacTimerHandle = xTimerCreate("dacTimer",
         							 pdMS_TO_TICKS(100),
                                      pdTRUE,
                                      0,
-                                     SwTimerCallback);
-    xTimerStart(SwTimerHandle, 0);
+                                     dacTimerCallback);
+    xTimerStart(dacTimerHandle, 0);
     while(1)
     {
     	if (write_flag)
@@ -112,7 +117,7 @@ static void dacTask(void *pvParameters)
     		log_func_Str(DebugMode, DACtask, "DAC Value:");
 #endif
 #ifdef NORMAL_MODE
-    		log_func_Str(NormalMode, DACtask, "");
+    		log_func_Str(NormalMode, null, "");
 #endif
     		Log_Integer(dac_vals[i]);
     		i++;
@@ -124,7 +129,7 @@ static void dacTask(void *pvParameters)
     		log_func_Str(DebugMode, DACtask, "*********Wave Generation Complete*************");
 #endif
 #ifdef NORMAL_MODE
-    		log_func_Str(NormalMode, DACtask, "*********Wave Generation Complete*************");
+    		log_func_Str(NormalMode, null, "*********Wave Generation Complete*************");
 #endif
     		}
 
@@ -132,15 +137,15 @@ static void dacTask(void *pvParameters)
     }
 }
 
-
+/* ADC task*/
 static void adcTask(void *pvParameters)
 {
-    SwTimerHandle_2 = xTimerCreate("SwTimer2",
+    adcTimerHandle = xTimerCreate("adcTimer",
         							 pdMS_TO_TICKS(100),
                                      pdTRUE,
                                      0,
-                                     SwTimerCallback_2);
-    xTimerStart(SwTimerHandle_2, 0);
+                                     adcTimerCallback);
+    xTimerStart(adcTimerHandle, 0);
 	while(1)
 	{
 		if (read_flag)
@@ -150,19 +155,27 @@ static void adcTask(void *pvParameters)
 						  ADC16_GetChannelStatusFlags(DEMO_ADC16_BASE, DEMO_ADC16_CHANNEL_GROUP)));
 			adc_val = ADC16_GetChannelConversionValue(DEMO_ADC16_BASE, DEMO_ADC16_CHANNEL_GROUP);  //Obtain ADC value
 			read_flag = 0;
-			src_adc[i] = adc_val;
-			i++;
+			q_add(&adc_val); //Updating the ADC value to the ADC buffer
+			q_copy(src_adc);
 			if(i==64){
 				i=0;
+				xSemaphoreTake(xMutex, portMAX_DELAY);
+				LED_GREEN_OFF();
+				LED_BLUE_TOGGLE();
+				vTaskDelay( xDelay );
+				xSemaphoreGive(xMutex);
 				DMA_transfer();
+				LED_BLUE_OFF();
+				q_reset();
 				dsp_ready = 1;
 			}
-//			q_add(&adc_val); //Updating the ADC value to the ADC buffer
+			i++;
+
 #ifdef DEBUG_MODE
     		log_func_Str(DebugMode, ADCtask, "ADC Value:");
 #endif
 #ifdef NORMAL_MODE
-    		log_func_Str(NormalMode, ADCtask, "");
+    		log_func_Str(NormalMode, null, "");
 #endif
     		Log_Integer(adc_val);
 
@@ -170,9 +183,11 @@ static void adcTask(void *pvParameters)
 		}
 	}
 }
-
+/* DSP Task */
 static void dspTask(void *pvParameters)
 {
+	static uint8_t run_count = 1;
+
 	while(1)
 	{
 		if (dsp_ready)
@@ -182,6 +197,17 @@ static void dspTask(void *pvParameters)
 			max = largest(dest_adc);
 			avg = average(dest_adc);
 			Sd = calculateSD(dest_adc);
+#ifdef NORMAL_MODE
+			log_func_Str(NormalMode, DSPtask, "MAX \t MIN \t AVG \t Standard Deviation");
+			Log_string("\n\r");
+			Log_Integer(max);
+			Log_string("\t");
+			Log_Integer(min);
+			Log_string("\t");
+			Log_Integer(avg);
+			Log_string("\t");
+			Log_Integer(Sd);
+#endif
 	#ifdef DEBUG_MODE
 				log_func_Str(DebugMode, DSPtask, "MAX \t MIN \t AVG \t Standard Deviation");
 				Log_string("\n\r");
@@ -192,11 +218,29 @@ static void dspTask(void *pvParameters)
 				Log_Integer(avg);
 				Log_string("\t");
 				Log_Integer(Sd);
+				log_func_Str(DebugMode, DSPtask, "Run Number of DSP task ");
+				Log_Integer(run_count);
 	#endif
+				run_count++;
+				if (run_count == 2)
+				{
+#ifdef DEBUG_MODE
+					log_func_Str(DebugMode, DSPtask, "DSP task has run 5 times, ending all tasks ");
+#endif
+					xTimerDelete(adcTimerHandle,0);
+					xTimerDelete(dacTimerHandle,0);
+					vTaskDelete(xdacTaskHandle);
+					vTaskDelete(xadcTaskHandle);
+					vTaskDelete(NULL);
+					vTaskEndScheduler();
+				}
 		}
 	}
 }
 
+/*
+ * Board Initialization functions
+ */
 void BOARD_Init(void)
 {
   	/* Init board hardware. */
@@ -206,8 +250,7 @@ void BOARD_Init(void)
     BOARD_InitDebugConsole();
     SystemCoreClockUpdate();
     xMutex = xSemaphoreCreateMutex();
-//    xSemaphoreTake(xMutex, portMAX_DELAY);
-//    xSemaphoreGive(xMutex);
+
 
 #ifdef DEBUG_MODE
     		log_func_Str(DebugMode, mainFunction, "LEDs initialized:");
@@ -216,12 +259,24 @@ void BOARD_Init(void)
     LED_GREEN_INIT(1);
     LED_RED_INIT(1);
 
+#ifdef DEBUG_MODE
+    		log_func_Str(DebugMode, mainFunction, "DACinitialized:");
+#endif
     dacInit();
 
+#ifdef DEBUG_MODE
+    		log_func_Str(DebugMode, mainFunction, "ADC initialized:");
+#endif
     adcInit();
 
-//    q_init(64, 32);
+#ifdef DEBUG_MODE
+    		log_func_Str(DebugMode, mainFunction, "DMA initialized:");
+#endif
+    dma_init();
 
-
+#ifdef DEBUG_MODE
+    		log_func_Str(DebugMode, mainFunction, "Queue to store ADC values initialized");
+#endif
+    q_init(64, 32);
 
 }

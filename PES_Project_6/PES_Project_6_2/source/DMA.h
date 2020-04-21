@@ -2,7 +2,7 @@
  * DMA.h
  *
  *  Created on: Apr 17, 2020
- *      Author: praka
+ *      Author: pavan and Antara
  */
 
 #ifndef DMA_H_
@@ -25,8 +25,8 @@ extern uint32_t dest_adc[64];
 #define DMA_CHANNEL 0
 #define DMA_SOURCE 63
 
-
-void DMA_transfer();
+void dma_init(void);
+void DMA_transfer(void);
 void DMA_Callback(dma_handle_t *handle, void *param);
 
 #endif /* DMA_H_ */

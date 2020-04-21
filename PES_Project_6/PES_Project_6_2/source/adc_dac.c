@@ -1,10 +1,13 @@
-
-
-
+/*
+ * adc_dac.h
+ *
+ *  Created on: Apr 18, 2020
+ *      Author: Pavan and Antara
+ */
 
 #include "adc_dac.h"
 
-
+/***************update DAC value***************************/
 void updateDACvals(void)
 {
 	static uint16_t count = 1;
@@ -15,6 +18,8 @@ void updateDACvals(void)
 		{
 			dac_vals[count] = dac_vals[count-1]+increment_val;
 		}
+	dac_vals[count] = dac_vals[count-1];
+	count++;
 	while (count < 50)
 	{
 		dac_vals[count] = dac_vals[count-1]-increment_val;
@@ -22,6 +27,7 @@ void updateDACvals(void)
 	}
 }
 
+/********************Initialize DAC **************************/
 void dacInit(void)
 {
 	dac_config_t dacConfigStruct;
@@ -30,6 +36,9 @@ void dacInit(void)
     DAC_Enable(DAC0, true); /* Enable output. */
 }
 
+
+
+/**********************Initialize ADC*****************************/
 void adcInit(void)
 {
 	ADC16_GetDefaultConfig(&adc16ConfigStruct);

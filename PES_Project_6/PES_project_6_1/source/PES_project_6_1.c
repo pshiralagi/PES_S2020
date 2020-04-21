@@ -45,10 +45,11 @@ int main(void) {
     SystemCoreClockUpdate();
     TimerHandle_t SwTimerHandle = NULL;
 #ifdef DEBUG_MODE
-    		log_func_Str(DebugMode, mainFunction, "Blue LED initialized:");
+    		log_func_Str(DebugMode, mainFunction, "Blue and Red LEDs initialized:");
 #endif
 
     LED_BLUE_INIT(1);
+    LED_RED_INIT(1);
     updateDACvals();
 #ifdef DEBUG_MODE
     		log_func_Str(DebugMode, mainFunction, "LUT Updated:");
@@ -56,6 +57,9 @@ int main(void) {
 
 
     dacInit();
+#ifdef DEBUG_MODE
+    		log_func_Str(DebugMode, mainFunction, "DAC initialized");
+#endif
     SwTimerHandle = xTimerCreate("SwTimer",
         							 pdMS_TO_TICKS(100),
                                      pdTRUE,

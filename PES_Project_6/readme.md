@@ -12,6 +12,10 @@ This project explores usage of DAC, ADC and DMA in a FreeRTOS environment.
 **Important Notes**
 1. Oscilloscope captures were not taken due to lack of access to equipment, instead the values were plotted in excel and a sine wave was seen
 2. Baud rate is set to **115200**
+3. ADC pin number - **j10 1**
+4. DAC pin number - **j10 11**
+5. Access to the shared LED is controlled through Mutex
+6. ADC values are stored in a queue, these values are then copied to a buffer and then transferred to the DSP buffer using DMA
 
 
 Demo video for this project can be viewed on drivce at
@@ -68,14 +72,14 @@ Each source file has its own header file.
 
 ## Project Comments
 
-- Combining the `extendBufferAdd` with `bufferAdd` creates problems because of the way `isBufferFull` works
-  it is fine if used seperately though, or if `extendBufferAdd` is used before buffer is full
-- Faced some problems with double pointers
+- Reading size of queue in FreeRTOS does not seem to be possible. 
+- Debugging without an oscilloscope or logic analyzer was very difficult as you can't tell if DAC or ADC is messed up.
 
 ## Execution Notes
 
-The mode can be selected in 'general.h' 
-Please see the [general.h file](./source/general.h) for further details.
+For project 6_2, connect ADC pin to DAC pin and observe similar values, every 1 run cycle (64 values) DSP functions are 
+carried out and after 5 run cycles, tasks are terminated.
+
 The data can be read on a terminal emulator with a baud rate of 115200.
 
 
