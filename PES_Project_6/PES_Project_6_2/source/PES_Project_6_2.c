@@ -43,7 +43,7 @@ adc16_channel_config_t adc16ChannelConfigStruct;
 SemaphoreHandle_t xMutex;
 const TickType_t xDelay = 500 / portTICK_PERIOD_MS;
 static bool write_flag = 0, read_flag = 0, dsp_ready = 0;
-uint8_t i = 0;
+
 uint16_t dac_vals[50];
 uint32_t adc_val = 0;
 uint32_t min, max, avg, Sd;
@@ -140,6 +140,8 @@ static void dacTask(void *pvParameters)
 /* ADC task*/
 static void adcTask(void *pvParameters)
 {
+	static uint8_t i = 0;
+	memset(src_adc, 0, sizeof(src_adc));
     adcTimerHandle = xTimerCreate("adcTimer",
         							 pdMS_TO_TICKS(100),
                                      pdTRUE,
@@ -156,7 +158,15 @@ static void adcTask(void *pvParameters)
 			adc_val = ADC16_GetChannelConversionValue(DEMO_ADC16_BASE, DEMO_ADC16_CHANNEL_GROUP);  //Obtain ADC value
 			read_flag = 0;
 			q_add(&adc_val); //Updating the ADC value to the ADC buffer
-			q_copy(src_adc);
+			q_copy(&src_adc[i]);
+#ifdef DEBUG_MODE
+    		log_func_Str(DebugMode, ADCtask, "ADC Value:");
+#endif
+#ifdef NORMAL_MODE
+    		log_func_Str(NormalMode, null, "");
+#endif
+    		Log_Integer(adc_val);
+			i++;
 			if(i==64){
 				i=0;
 				xSemaphoreTake(xMutex, portMAX_DELAY);
@@ -167,18 +177,9 @@ static void adcTask(void *pvParameters)
 				DMA_transfer();
 				LED_BLUE_OFF();
 				q_reset();
+				memset(src_adc, 0, sizeof(src_adc));
 				dsp_ready = 1;
 			}
-			i++;
-
-#ifdef DEBUG_MODE
-    		log_func_Str(DebugMode, ADCtask, "ADC Value:");
-#endif
-#ifdef NORMAL_MODE
-    		log_func_Str(NormalMode, null, "");
-#endif
-    		Log_Integer(adc_val);
-
 
 		}
 	}
@@ -222,7 +223,7 @@ static void dspTask(void *pvParameters)
 				Log_Integer(run_count);
 	#endif
 				run_count++;
-				if (run_count == 2)
+				if (run_count == 6)
 				{
 #ifdef DEBUG_MODE
 					log_func_Str(DebugMode, DSPtask, "DSP task has run 5 times, ending all tasks ");
@@ -277,6 +278,6 @@ void BOARD_Init(void)
 #ifdef DEBUG_MODE
     		log_func_Str(DebugMode, mainFunction, "Queue to store ADC values initialized");
 #endif
-    q_init(64, 32);
+    q_init(64, 4);
 
 }

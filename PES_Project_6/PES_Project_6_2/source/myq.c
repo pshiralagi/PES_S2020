@@ -26,5 +26,5 @@ void q_reset (void)
 
 void q_copy (uint32_t *store)
 {
-	xQueuePeek(log_queue, store, 0);
+	xQueueReceive(log_queue, store, 0);
 }
