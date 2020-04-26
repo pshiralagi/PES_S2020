@@ -17,8 +17,6 @@ This project explores usage of DAC, ADC and DMA in a FreeRTOS environment.
 5. Access to the shared LED is controlled through Mutex
 6. ADC values are stored in a queue, these values are then copied to a buffer and then transferred to the DSP buffer using DMA
 
-
-Demo video for this project can be viewed on drivce at
 Excel plot of sine wave is available at [WavePlotExcel.png file](./PES_project_6_1/doc/WavePlotExcel.png)
 
 **This project consists of two seperate sub project files -**

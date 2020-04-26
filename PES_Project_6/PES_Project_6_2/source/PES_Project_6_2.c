@@ -141,6 +141,7 @@ static void dacTask(void *pvParameters)
 static void adcTask(void *pvParameters)
 {
 	static uint8_t i = 0;
+	static uint32_t start = 0, stop = 0, timetaken=0;
 	memset(src_adc, 0, sizeof(src_adc));
     adcTimerHandle = xTimerCreate("adcTimer",
         							 pdMS_TO_TICKS(100),
@@ -174,7 +175,21 @@ static void adcTask(void *pvParameters)
 				LED_BLUE_TOGGLE();
 				vTaskDelay( xDelay );
 				xSemaphoreGive(xMutex);
+				start = xTaskGetTickCount();
 				DMA_transfer();
+				stop = xTaskGetTickCount();
+				timetaken = stop - start;
+#ifdef DEBUG_MODE
+				log_func_Str(DebugMode, null, " Time taken in DMA function");
+				Log_Integer(timetaken);
+				Log_string("ms");
+#endif
+#ifdef NORMAL_MODE
+				log_func_Str(NormalMode, null, "");
+				Log_Integer(timetaken);
+				Log_string("ms");
+#endif
+
 				LED_BLUE_OFF();
 				q_reset();
 				memset(src_adc, 0, sizeof(src_adc));
@@ -199,8 +214,8 @@ static void dspTask(void *pvParameters)
 			avg = average(dest_adc);
 			Sd = calculateSD(dest_adc);
 #ifdef NORMAL_MODE
-			log_func_Str(NormalMode, DSPtask, "MAX \t MIN \t AVG \t Standard Deviation");
-			Log_string("\n\r");
+			log_func_Str(NormalMode, null, "MAX \t MIN \t AVG \t Standard Deviation");
+			log_func_Str(NormalMode, null, "");
 			Log_Integer(max);
 			Log_string("\t");
 			Log_Integer(min);
@@ -211,7 +226,7 @@ static void dspTask(void *pvParameters)
 #endif
 	#ifdef DEBUG_MODE
 				log_func_Str(DebugMode, DSPtask, "MAX \t MIN \t AVG \t Standard Deviation");
-				Log_string("\n\r");
+				log_func_Str(DebugMode, DSPtask, "");
 				Log_Integer(max);
 				Log_string("\t");
 				Log_Integer(min);

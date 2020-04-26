@@ -46,5 +46,12 @@ void DMA_transfer(void){
     while (g_Transfer_Done != true)
     {
     }
+#ifdef DEBUG_MODE
+    PRINTF("Destination Buffer:\r\n");
+        for (uint8_t i = 0; i < BUFF_LENGTH; i++)
+        {
+            PRINTF("%d\t", dest_adc[i]);
+        }
+#endif
 }
 

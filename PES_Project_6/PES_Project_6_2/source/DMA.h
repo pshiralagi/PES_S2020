@@ -17,6 +17,7 @@
 
 #include "pin_mux.h"
 #include "clock_config.h"
+#include "log.h"
 
 extern uint32_t src_adc[64];
 extern uint32_t dest_adc[64];
